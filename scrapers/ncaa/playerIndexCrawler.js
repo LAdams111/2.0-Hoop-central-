@@ -44,6 +44,8 @@ async function crawlPlayerIndex() {
         continue;
       }
 
+      // Sports Reference wraps the player index table in HTML comments;
+      // strip comment tags so Cheerio can see the links.
       const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
       const $ = cheerio.load(cleanedHtml);
 
@@ -52,6 +54,7 @@ async function crawlPlayerIndex() {
         const href = $(el).attr("href");
         if (!href) return;
         const path = href.split("?")[0];
+        // Keep only real player profile URLs: /cbb/players/{name}-{number}.html
         if (!PLAYER_PATH_REGEX.test(path)) return;
         const full = path.startsWith("http") ? path : `${BASE_ORIGIN}${path}`;
         if (seen.has(full)) return;
