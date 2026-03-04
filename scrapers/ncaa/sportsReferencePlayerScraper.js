@@ -101,7 +101,8 @@ async function scrapePlayer(url) {
     await browser.close();
   }
 
-  const $ = cheerio.load(html);
+  const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
+  const $ = cheerio.load(cleanedHtml);
 
   // --- Player name (h1 span or h1) ---
   const fullName =
