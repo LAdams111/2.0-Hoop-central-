@@ -41,24 +41,26 @@ async function crawlPlayerIndex() {
         continue;
       }
 
-      // Sports Reference wraps the player index table in HTML comments;
-      // strip comment tags so Cheerio can see the links.
-      const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
+      // 1. Page HTML retrieved above via page.content()
+      // 2. Strip HTML comments so the players table (wrapped in comments) is visible to Cheerio
+      const cleanedHtml = html
+        .replace(/<!--/g, "")
+        .replace(/-->/g, "");
+
+      // 3. Load cleaned HTML into Cheerio
       const $ = cheerio.load(cleanedHtml);
 
-      const seen = new Set();
+      // 4. Extract player links from the players table only
+      let count = 0;
       $('#players tbody tr td[data-stat="player"] a').each((i, el) => {
         const href = $(el).attr("href");
-        if (href) {
-          const fullUrl = href.startsWith("http") ? href : BASE_ORIGIN + href;
-          if (!seen.has(fullUrl)) {
-            seen.add(fullUrl);
-            playerUrls.push(fullUrl);
-          }
-        }
+        if (!href) return;
+        const fullUrl = href.startsWith("http") ? href : BASE_ORIGIN + href;
+        playerUrls.push(fullUrl);
+        count += 1;
       });
 
-      const count = seen.size;
+      // 5. Log players found per letter
       console.log(`Letter: ${letter} → players found: ${count}`);
       await new Promise((resolve) => setTimeout(resolve, 1500));
     }
