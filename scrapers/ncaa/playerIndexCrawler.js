@@ -1,8 +1,9 @@
 const puppeteer = require("puppeteer");
-const cheerio = require("cheerio");
 
-const BASE_URL = "https://www.sports-reference.com/cbb/players";
 const BASE_ORIGIN = "https://www.sports-reference.com";
+
+/** Only real player profile URLs: /cbb/players/{name}-{number}.html */
+const PLAYER_LINK_REGEX = /^\/cbb\/players\/[a-z\-]+-\d+\.html$/;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,39 +30,29 @@ async function crawlPlayerIndex() {
       console.log(`Visiting: ${url}`);
       await delay(2000);
 
-      let html;
+      let links;
       try {
         await page.goto(url, {
           waitUntil: "domcontentloaded",
           timeout: 30000,
         });
-        html = await page.content();
+        await page.waitForSelector("#players a", { timeout: 8000 }).catch(() => {});
+
+        links = await page.evaluate(() => {
+          const anchors = Array.from(document.querySelectorAll("#players a"));
+          return anchors.map((a) => a.getAttribute("href"));
+        });
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
         continue;
       }
 
-      // 1. Page HTML retrieved above via page.content()
-      // 2. Strip HTML comments so the players table (wrapped in comments) is visible to Cheerio
-      const cleanedHtml = html
-        .replace(/<!--/g, "")
-        .replace(/-->/g, "");
+      const playerLinks = links
+        .filter((href) => href && PLAYER_LINK_REGEX.test(href))
+        .map((href) => BASE_ORIGIN + href);
 
-      // 3. Load cleaned HTML into Cheerio
-      const $ = cheerio.load(cleanedHtml);
-
-      // 4. Extract player links from the players table only
-      let count = 0;
-      $('#players tbody tr td[data-stat="player"] a').each((i, el) => {
-        const href = $(el).attr("href");
-        if (!href) return;
-        const fullUrl = href.startsWith("http") ? href : BASE_ORIGIN + href;
-        playerUrls.push(fullUrl);
-        count += 1;
-      });
-
-      // 5. Log players found per letter
-      console.log(`Letter: ${letter} → players found: ${count}`);
+      playerUrls.push(...playerLinks);
+      console.log(`Letter: ${letter} → players found: ${playerLinks.length}`);
       await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   } finally {
