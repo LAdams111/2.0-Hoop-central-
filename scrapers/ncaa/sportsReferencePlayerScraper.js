@@ -1,5 +1,5 @@
-const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const browserService = require("../../services/browserService");
 const {
   findOrCreatePlayer,
   attachExternalId,
@@ -75,11 +75,11 @@ async function scrapePlayer(url) {
   console.log("Scraping player page:", url);
   await delay(2000);
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  let page;
   let html;
 
   try {
-    const page = await browser.newPage();
+    page = await browserService.getPage();
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     );
@@ -98,7 +98,7 @@ async function scrapePlayer(url) {
     console.error("Failed to fetch player page:", err.message);
     return null;
   } finally {
-    await browser.close();
+    if (page) await page.close();
   }
 
   const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
