@@ -16,8 +16,9 @@ function sleep(ms) {
     process.exit(1);
   }
 
-  const { player, seasonsProcessed } = result;
-  console.log("Done. Player:", player.full_name, "| Seasons processed:", seasonsProcessed);
+  const { player, seasons } = result;
+  console.log("Player name:", player.name);
+  console.log("Seasons found:", seasons.length);
 })().catch((err) => {
   console.error("Scraper error:", err);
   process.exit(1);

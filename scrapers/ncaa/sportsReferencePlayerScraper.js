@@ -58,6 +58,15 @@ function parseNumOrNull(text) {
 }
 
 /**
+ * Parse float from table cell (for pts_per_g, trb_per_g, ast_per_g).
+ */
+function parseFloatOrNull(text) {
+  if (text == null || text === "") return null;
+  const n = parseFloat(String(text).replace(/,/g, ""));
+  return Number.isNaN(n) ? null : n;
+}
+
+/**
  * Scrape a single NCAA player page from Sports Reference and insert
  * the player and season stats into the canonical database.
  * @param {string} url - Full URL to the player page (e.g. .../cbb/players/zion-williamson-1.html)
@@ -79,6 +88,10 @@ async function scrapePlayer(url) {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
+
+    await page.waitForSelector("#players_per_game tbody tr", {
+      timeout: 8000,
+    }).catch(() => {});
 
     html = await page.content();
   } catch (err) {
@@ -123,8 +136,9 @@ async function scrapePlayer(url) {
 
   // --- Season stats table: #players_per_game ---
   const table = $("#players_per_game");
+  const seasons = [];
   if (!table.length) {
-    return { player, seasonsProcessed: 0 };
+    return { player: { name: fullName }, seasons };
   }
 
   const rows = table.find("tbody tr").get();
@@ -132,7 +146,9 @@ async function scrapePlayer(url) {
 
   for (const rowEl of rows) {
     const row = $(rowEl);
-    const seasonCell = row.find('td[data-stat="season"]');
+    const seasonCell = row.find('th[data-stat="season"]').length
+      ? row.find('th[data-stat="season"]')
+      : row.find('td[data-stat="season"]');
     const schoolCell = row.find('td[data-stat="school_name"]').length
       ? row.find('td[data-stat="school_name"]')
       : row.find('td[data-stat="team_name"]');
@@ -142,10 +158,24 @@ async function scrapePlayer(url) {
     const teamName = schoolCell.text().trim();
     if (!seasonText || !teamName) continue;
 
+    const gamesPlayed = parseIntOrNull(row.find('td[data-stat="g"]').text());
+    const ptsPerG = parseFloatOrNull(row.find('td[data-stat="pts_per_g"]').text());
+    const trbPerG = parseFloatOrNull(row.find('td[data-stat="trb_per_g"]').text());
+    const astPerG = parseFloatOrNull(row.find('td[data-stat="ast_per_g"]').text());
+
+    seasons.push({
+      season: seasonText,
+      school: teamName,
+      g: gamesPlayed,
+      pts_per_g: ptsPerG,
+      trb_per_g: trbPerG,
+      ast_per_g: astPerG,
+    });
+
     const parsed = parseSeasonYear(seasonText);
     if (!parsed) continue;
 
-    const games = parseIntOrNull(row.find('td[data-stat="g"]').text());
+    const games = gamesPlayed;
     const points = parseNumOrNull(row.find('td[data-stat="pts_per_g"]').text());
     const rebounds = parseNumOrNull(row.find('td[data-stat="trb_per_g"]').text());
     const assists = parseNumOrNull(row.find('td[data-stat="ast_per_g"]').text());
@@ -191,7 +221,7 @@ async function scrapePlayer(url) {
     seasonsProcessed += 1;
   }
 
-  return { player, seasonsProcessed };
+  return { player: { name: fullName }, seasons };
 }
 
 module.exports = { scrapePlayer };
