@@ -26,35 +26,34 @@ async function crawlPlayerIndex() {
     );
 
     for (const letter of letters) {
-      const url = `https://www.sports-reference.com/cbb/players/${letter}/`;
+      const url = `https://www.sports-reference.com/cbb/players/${letter}-index.html`;
       console.log(`Visiting: ${url}`);
       await delay(2000);
 
-      let links;
+      let playerLinks;
       try {
-        await page.goto(url, {
-          waitUntil: "domcontentloaded",
-          timeout: 30000,
-        });
-        await page.waitForSelector("#players a", { timeout: 8000 }).catch(() => {});
+        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
-        links = await page.evaluate(() => {
-          const anchors = Array.from(document.querySelectorAll("#players a"));
-          return anchors.map((a) => a.getAttribute("href"));
+        playerLinks = await page.evaluate(() => {
+          const links = Array.from(document.querySelectorAll("a[href^='/cbb/players/']"));
+          return links.map((link) => link.getAttribute("href"));
         });
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
         continue;
       }
 
-      const playerLinks = links
+      const validPlayers = (playerLinks || [])
         .filter((href) => href && PLAYER_LINK_REGEX.test(href))
         .map((href) => BASE_ORIGIN + href);
 
-      playerUrls.push(...playerLinks);
-      console.log(`Letter: ${letter} → players found: ${playerLinks.length}`);
+      playerUrls.push(...validPlayers);
+      console.log(`Letter: ${letter} → players found: ${validPlayers.length}`);
       await new Promise((resolve) => setTimeout(resolve, 1500));
     }
+
+    console.log("Total players discovered:", playerUrls.length);
+    console.log("First 10 players:", playerUrls.slice(0, 10));
   } finally {
     await browser.close();
   }
