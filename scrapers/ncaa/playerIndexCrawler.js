@@ -4,8 +4,8 @@ const cheerio = require("cheerio");
 const BASE_URL = "https://www.sports-reference.com/cbb/players";
 const BASE_ORIGIN = "https://www.sports-reference.com";
 
-/** /cbb/players/{player-slug}.html — profile page, not index */
-const PLAYER_PATH_REGEX = /^\/cbb\/players\/[^/]+\.html$/;
+/** /cbb/players/{player-name}-{number}.html — real profile page only (excludes e.g. a-index.html) */
+const PLAYER_PATH_REGEX = /^\/cbb\/players\/[a-z\-]+-\d+\.html$/;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
