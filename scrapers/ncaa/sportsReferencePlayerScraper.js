@@ -104,15 +104,6 @@ async function scrapePlayer(url) {
   const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
   const $ = cheerio.load(cleanedHtml);
 
-  console.log("Tables found on page:");
-  $("table").each((i, el) => {
-    const id = $(el).attr("id");
-    console.log("table id:", id);
-  });
-
-  const debugRows = $("#players_per_game tbody tr");
-  console.log("Rows found:", debugRows.length);
-
   // --- Player name (h1 span or h1) ---
   const fullName =
     $("h1 span").first().text().trim() || $("h1").first().text().trim();
@@ -156,19 +147,6 @@ async function scrapePlayer(url) {
 
   for (const rowEl of rows) {
     const row = $(rowEl);
-    const seasonVal = row.find('th[data-stat="year_id"]').text().trim()
-      || row.find('td[data-stat="year_id"]').text().trim()
-      || row.find('th[data-stat="season"]').text().trim()
-      || row.find('td[data-stat="season"]').text().trim();
-    const schoolVal = row.find('td[data-stat="team_name_abbr"]').text().trim()
-      || row.find('td[data-stat="school_name"]').text().trim()
-      || row.find('td[data-stat="team_name"]').text().trim();
-
-    console.log("ROW DEBUG:");
-    console.log("  season:", JSON.stringify(seasonVal));
-    console.log("  school:", JSON.stringify(schoolVal));
-    console.log("  row html:", $(row).html());
-
     const seasonCell = row.find('th[data-stat="year_id"]').length
       ? row.find('th[data-stat="year_id"]')
       : row.find('td[data-stat="year_id"]').length

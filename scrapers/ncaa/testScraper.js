@@ -18,7 +18,8 @@ function sleep(ms) {
 
   const { player, seasons } = result;
   console.log("Player name:", player.name);
-  console.log("Seasons found:", seasons.length);
+  console.log("Seasons scraped:", seasons.length);
+  console.log("Database inserts completed");
 })().catch((err) => {
   console.error("Scraper error:", err);
   process.exit(1);
