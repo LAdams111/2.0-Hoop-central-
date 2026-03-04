@@ -42,9 +42,26 @@ async function crawlPlayerIndex() {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         playerLinks = await page.evaluate(() => {
+          // Convert HTML comment blocks into real DOM
+          const walker = document.createTreeWalker(
+            document,
+            NodeFilter.SHOW_COMMENT,
+            null,
+            false
+          );
+
+          let node;
+          while ((node = walker.nextNode())) {
+            const container = document.createElement("div");
+            container.innerHTML = node.nodeValue;
+            node.parentNode.replaceChild(container, node);
+          }
+
+          // After comment stripping, collect player links
           const links = Array.from(
             document.querySelectorAll("a[href^='/cbb/players/']")
           );
+
           return links.map((a) => a.getAttribute("href"));
         });
       } catch (err) {
