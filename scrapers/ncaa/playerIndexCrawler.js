@@ -22,10 +22,7 @@ async function crawlPlayerIndex() {
     );
 
     for (const letter of letters) {
-      const url =
-        letter === "a"
-          ? `${BASE}/cbb/players/a-index.html`
-          : `${BASE}/cbb/players/${letter}/`;
+      const url = `${BASE}/cbb/players/${letter}-index.html`;
 
       console.log(`Visiting: ${url}`);
 
@@ -33,8 +30,7 @@ async function crawlPlayerIndex() {
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
         await new Promise((r) => setTimeout(r, 2000));
 
-        // Unwrap HTML comments so any commented tables become visible, then get player links.
-        // Note: links are not under #players on this site; use all /cbb/players/ links and filter by profile regex.
+        // Unwrap HTML comments in the page so commented tables become part of the DOM, then collect links.
         const rawHrefs = await page.evaluate(() => {
           const walker = document.createTreeWalker(
             document,
@@ -49,7 +45,7 @@ async function crawlPlayerIndex() {
             node.parentNode.replaceChild(div, node);
           }
           const links = [];
-          document.querySelectorAll("a[href^='/cbb/players/']").forEach((a) => {
+          document.querySelectorAll('a[href^="/cbb/players/"]').forEach((a) => {
             const href = a.getAttribute("href");
             if (href) links.push(href);
           });
