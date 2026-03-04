@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "db:schema": "psql -d hoop_central -f db/schema.sql",
+    "db:create": "createdb hoop_central"
   },
   "dependencies": {
     "axios": "^1.6.0",
