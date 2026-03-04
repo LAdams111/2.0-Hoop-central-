@@ -1,4 +1,4 @@
-const axios = require("axios");
+const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const {
   findOrCreatePlayer,
@@ -63,33 +63,41 @@ function parseNumOrNull(text) {
  * @param {string} url - Full URL to the player page (e.g. .../cbb/players/zion-williamson-1.html)
  */
 async function scrapePlayer(url) {
-  console.log(`Scraping player page: ${url}`);
+  console.log("Scraping player page:", url);
   await delay(2000);
 
-  let response;
+  const browser = await puppeteer.launch({ headless: "new" });
+  let html;
+
   try {
-    response = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        Connection: "keep-alive",
-      },
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    );
+
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
     });
+
+    html = await page.content();
   } catch (err) {
     console.error("Failed to fetch player page:", err.message);
-    return;
+    return null;
+  } finally {
+    await browser.close();
   }
 
-  const $ = cheerio.load(response.data);
+  const $ = cheerio.load(html);
 
-  // --- Player name (h1) ---
-  const fullName = $("h1").first().text().trim();
+  // --- Player name (h1 span or h1) ---
+  const fullName =
+    $("h1 span").first().text().trim() || $("h1").first().text().trim();
   if (!fullName) {
-    throw new Error("Could not find player name (h1) on page");
+    console.error("Could not find player name (h1) on page");
+    return null;
   }
+  console.log("Player name:", fullName);
   const lastSpace = fullName.lastIndexOf(" ");
   const first_name = lastSpace > 0 ? fullName.slice(0, lastSpace).trim() : fullName;
   const last_name = lastSpace > 0 ? fullName.slice(lastSpace + 1).trim() : null;
