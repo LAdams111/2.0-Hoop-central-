@@ -4,8 +4,8 @@ const cheerio = require("cheerio");
 const BASE_URL = "https://www.sports-reference.com/cbb/players";
 const BASE_ORIGIN = "https://www.sports-reference.com";
 
-/** /cbb/players/{player-name}-{number}.html — real profile page only (excludes e.g. a-index.html) */
-const PLAYER_PATH_REGEX = /^\/cbb\/players\/[a-z\-]+-\d+\.html$/;
+/** /cbb/players/{player-name}-{number}.html — real profile page (flexible slug for apostrophes etc.) */
+const PLAYER_PATH_REGEX = /^\/cbb\/players\/.*-\d+\.html$/;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -28,7 +28,7 @@ async function crawlPlayerIndex() {
     );
 
     for (const letter of letters) {
-      const url = `${BASE_URL}/${letter}/`;
+      const url = `${BASE_URL}/${letter}-index.html`;
       await delay(2000);
 
       let html;
@@ -59,6 +59,7 @@ async function crawlPlayerIndex() {
       });
 
       console.log(`Letter: ${letter} → players found: ${seen.size}`);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   } finally {
     await browser.close();
