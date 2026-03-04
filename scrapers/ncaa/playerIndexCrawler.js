@@ -23,6 +23,7 @@ async function crawlPlayerIndex() {
 
   try {
     const page = await browser.newPage();
+    await page.setCacheEnabled(false);
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     );
@@ -35,9 +36,10 @@ async function crawlPlayerIndex() {
       let html;
       try {
         await page.goto(url, {
-          waitUntil: "domcontentloaded",
+          waitUntil: "load",
           timeout: 30000,
         });
+        await delay(1500);
         html = await page.content();
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
