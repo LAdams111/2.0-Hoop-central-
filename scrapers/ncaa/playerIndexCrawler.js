@@ -1,12 +1,12 @@
 const puppeteer = require("puppeteer");
-const cheerio = require("cheerio");
 
 const BASE = "https://www.sports-reference.com";
-const PLAYER_LINK_REGEX = /^\/cbb\/players\/[a-z\-]+-\d+\.html$/;
+/** Profile URLs: /cbb/players/{slug}-{number}.html — allow apostrophes etc. in slug */
+const PLAYER_LINK_REGEX = /^\/cbb\/players\/.*-\d+\.html$/;
 
 /**
  * Crawl Sports Reference NCAA player index by letter and collect all player profile URLs.
- * Uses Puppeteer to fetch (avoid 403), then Cheerio to parse HTML including commented tables.
+ * Uses Puppeteer to fetch (avoid 403), unwraps HTML comments in-page, then collects player profile links.
  * @returns {Promise<string[]>} Full URLs for each player page (deduplicated)
  */
 async function crawlPlayerIndex() {
@@ -31,22 +31,36 @@ async function crawlPlayerIndex() {
 
       try {
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+        await new Promise((r) => setTimeout(r, 2000));
 
-        let html = await page.content();
-
-        html = html.replace(/<!--/g, "").replace(/-->/g, "");
-
-        const $ = cheerio.load(html);
-        const links = [];
-
-        $("#players a[href^='/cbb/players/']").each((_, el) => {
-          const href = $(el).attr("href");
-          if (href && PLAYER_LINK_REGEX.test(href)) {
-            links.push(BASE + href);
+        // Unwrap HTML comments so any commented tables become visible, then get player links.
+        // Note: links are not under #players on this site; use all /cbb/players/ links and filter by profile regex.
+        const rawHrefs = await page.evaluate(() => {
+          const walker = document.createTreeWalker(
+            document,
+            NodeFilter.SHOW_COMMENT,
+            null,
+            false
+          );
+          let node;
+          while ((node = walker.nextNode())) {
+            const div = document.createElement("div");
+            div.innerHTML = node.nodeValue;
+            node.parentNode.replaceChild(div, node);
           }
+          const links = [];
+          document.querySelectorAll("a[href^='/cbb/players/']").forEach((a) => {
+            const href = a.getAttribute("href");
+            if (href) links.push(href);
+          });
+          return links;
         });
 
+        const links = (rawHrefs || [])
+          .filter((href) => PLAYER_LINK_REGEX.test(href))
+          .map((href) => BASE + href);
         const unique = Array.from(new Set(links));
+
         console.log(`Letter ${letter} → players found: ${unique.length}`);
         playerUrls.push(...unique);
 
