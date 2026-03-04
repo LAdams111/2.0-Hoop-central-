@@ -1,8 +1,8 @@
-const puppeteer = require("puppeteer");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
-const BASE_ORIGIN = "https://www.sports-reference.com";
+const BASE = "https://www.sports-reference.com";
 
-/** Only real player profile URLs: /cbb/players/{name}-{number}.html */
 const PLAYER_LINK_REGEX = /^\/cbb\/players\/[a-z\-]+-\d+\.html$/;
 
 function delay(ms) {
@@ -15,77 +15,54 @@ function delay(ms) {
  */
 async function crawlPlayerIndex() {
   const playerUrls = [];
-  const letters = ["a", "b", "c"]; // temporarily limit for faster testing; use "abcdefghijklmnopqrstuvwxyz".split("") for full crawl
+  const letters = "abcdefghijklmnopqrstuvwxyz".split("");
 
-  const browser = await puppeteer.launch({ headless: "new" });
-
-  try {
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    );
-
-    for (const letter of letters) {
-      let url;
-      if (letter === "a") {
-        url = "https://www.sports-reference.com/cbb/players/a-index.html";
-      } else {
-        url = `https://www.sports-reference.com/cbb/players/${letter}/`;
-      }
-      console.log(`Visiting: ${url}`);
-      await delay(2000);
-
-      let playerLinks;
-      try {
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
-        await page.waitForSelector("body");
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        playerLinks = await page.evaluate(() => {
-          // Convert HTML comment blocks into real DOM
-          const walker = document.createTreeWalker(
-            document,
-            NodeFilter.SHOW_COMMENT,
-            null,
-            false
-          );
-
-          let node;
-          while ((node = walker.nextNode())) {
-            const container = document.createElement("div");
-            container.innerHTML = node.nodeValue;
-            node.parentNode.replaceChild(container, node);
-          }
-
-          // After comment stripping, collect player links
-          const links = Array.from(
-            document.querySelectorAll("a[href^='/cbb/players/']")
-          );
-
-          return links.map((a) => a.getAttribute("href"));
-        });
-      } catch (err) {
-        console.log(`Letter: ${letter} → failed to load (${err.message})`);
-        continue;
-      }
-
-      const validPlayers = (playerLinks || [])
-        .filter((href) => href && PLAYER_LINK_REGEX.test(href))
-        .map((href) => BASE_ORIGIN + href);
-
-      console.log(`Letter ${letter} raw links: ${(playerLinks || []).length}`);
-      console.log(`Letter ${letter} valid players: ${validPlayers.length}`);
-      playerUrls.push(...validPlayers);
-      console.log(`Letter: ${letter} → players found: ${validPlayers.length}`);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+  for (const letter of letters) {
+    let url;
+    if (letter === "a") {
+      url = `${BASE}/cbb/players/a-index.html`;
+    } else {
+      url = `${BASE}/cbb/players/${letter}/`;
     }
 
-    console.log("Total players discovered:", playerUrls.length);
-    console.log("First 10 players:", playerUrls.slice(0, 10));
-  } finally {
-    await browser.close();
+    console.log(`Visiting: ${url}`);
+
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+        timeout: 30000,
+      });
+
+      let html = response.data;
+
+      // Remove HTML comments so hidden tables appear
+      html = html.replace(/<!--/g, "").replace(/-->/g, "");
+
+      const $ = cheerio.load(html);
+
+      const links = [];
+
+      $('a[href^="/cbb/players/"]').each((i, el) => {
+        const href = $(el).attr("href");
+        if (href && PLAYER_LINK_REGEX.test(href)) {
+          links.push(BASE + href);
+        }
+      });
+
+      console.log(`Letter ${letter} → players found: ${links.length}`);
+      playerUrls.push(...links);
+
+      await delay(1500);
+    } catch (err) {
+      console.log(`Letter ${letter} → failed to load (${err.message})`);
+    }
   }
 
+  console.log("Total players discovered:", playerUrls.length);
   return playerUrls;
 }
 
