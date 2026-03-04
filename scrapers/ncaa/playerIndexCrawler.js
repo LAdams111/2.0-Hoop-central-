@@ -4,9 +4,6 @@ const cheerio = require("cheerio");
 const BASE_URL = "https://www.sports-reference.com/cbb/players";
 const BASE_ORIGIN = "https://www.sports-reference.com";
 
-/** /cbb/players/{player-name}-{number}.html — real profile page (flexible slug for apostrophes etc.) */
-const PLAYER_PATH_REGEX = /^\/cbb\/players\/.*-\d+\.html$/;
-
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -23,7 +20,6 @@ async function crawlPlayerIndex() {
 
   try {
     const page = await browser.newPage();
-    await page.setCacheEnabled(false);
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     );
@@ -36,10 +32,9 @@ async function crawlPlayerIndex() {
       let html;
       try {
         await page.goto(url, {
-          waitUntil: "load",
+          waitUntil: "domcontentloaded",
           timeout: 30000,
         });
-        await delay(1500);
         html = await page.content();
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
@@ -52,19 +47,19 @@ async function crawlPlayerIndex() {
       const $ = cheerio.load(cleanedHtml);
 
       const seen = new Set();
-      $('a[href^="/cbb/players/"]').each((_, el) => {
+      $('#players tbody tr td[data-stat="player"] a').each((i, el) => {
         const href = $(el).attr("href");
-        if (!href) return;
-        const path = href.split("?")[0];
-        // Keep only real player profile URLs: /cbb/players/{name}-{number}.html
-        if (!PLAYER_PATH_REGEX.test(path)) return;
-        const full = path.startsWith("http") ? path : `${BASE_ORIGIN}${path}`;
-        if (seen.has(full)) return;
-        seen.add(full);
-        playerUrls.push(full);
+        if (href) {
+          const fullUrl = href.startsWith("http") ? href : BASE_ORIGIN + href;
+          if (!seen.has(fullUrl)) {
+            seen.add(fullUrl);
+            playerUrls.push(fullUrl);
+          }
+        }
       });
 
-      console.log(`Letter: ${letter} → players found: ${seen.size}`);
+      const count = seen.size;
+      console.log(`Letter: ${letter} → players found: ${count}`);
       await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   } finally {
