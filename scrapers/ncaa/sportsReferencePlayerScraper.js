@@ -63,14 +63,25 @@ function parseNumOrNull(text) {
  * @param {string} url - Full URL to the player page (e.g. .../cbb/players/zion-williamson-1.html)
  */
 async function scrapePlayer(url) {
+  console.log(`Scraping player page: ${url}`);
   await delay(2000);
 
-  const response = await axios.get(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    },
-  });
+  let response;
+  try {
+    response = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        Connection: "keep-alive",
+      },
+    });
+  } catch (err) {
+    console.error("Failed to fetch player page:", err.message);
+    return;
+  }
 
   const $ = cheerio.load(response.data);
 
