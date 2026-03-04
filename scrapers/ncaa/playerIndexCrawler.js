@@ -41,10 +41,14 @@ async function crawlPlayerIndex() {
         await page.waitForSelector("body");
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        playerLinks = await page.evaluate(() => {
-          const links = Array.from(document.querySelectorAll("a[href^='/cbb/players/']"));
-          return links.map((link) => link.getAttribute("href"));
-        });
+        playerLinks = await page.evaluate((letter) => {
+          const header = document.querySelector(`h2#${letter.toUpperCase()}`);
+          if (!header) return [];
+          const table = header.nextElementSibling;
+          if (!table) return [];
+          const links = Array.from(table.querySelectorAll("a[href^='/cbb/players/']"));
+          return links.map((a) => a.getAttribute("href"));
+        }, letter);
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
         continue;
