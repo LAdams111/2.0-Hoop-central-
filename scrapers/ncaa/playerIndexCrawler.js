@@ -37,7 +37,9 @@ async function crawlPlayerIndex() {
 
       let playerLinks;
       try {
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.waitForSelector("body");
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         playerLinks = await page.evaluate(() => {
           const links = Array.from(document.querySelectorAll("a[href^='/cbb/players/']"));
