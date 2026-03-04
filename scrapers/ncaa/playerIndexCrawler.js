@@ -38,9 +38,12 @@ async function crawlPlayerIndex() {
 
         const $ = cheerio.load(html);
         const links = [];
-        $('a[href^="/cbb/players/"]').each((_, el) => {
+
+        $("#players tbody tr th a").each((_, el) => {
           const href = $(el).attr("href");
-          if (href && PLAYER_LINK_REGEX.test(href)) links.push(BASE + href);
+          if (href && PLAYER_LINK_REGEX.test(href)) {
+            links.push(BASE + href);
+          }
         });
 
         const unique = Array.from(new Set(links));
