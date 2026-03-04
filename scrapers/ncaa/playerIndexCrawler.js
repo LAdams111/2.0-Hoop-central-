@@ -28,7 +28,8 @@ async function crawlPlayerIndex() {
     );
 
     for (const letter of letters) {
-      const url = `${BASE_URL}/${letter}-index.html`;
+      const url = `https://www.sports-reference.com/cbb/players/${letter}-index.html`;
+      console.log(`Visiting: ${url}`);
       await delay(2000);
 
       let html;
