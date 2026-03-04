@@ -15,7 +15,7 @@ function delay(ms) {
  */
 async function crawlPlayerIndex() {
   const playerUrls = [];
-  const letters = "abcdefghijklmnopqrstuvwxyz".split("");
+  const letters = ["a", "b", "c"]; // temporarily limit for faster testing; use "abcdefghijklmnopqrstuvwxyz".split("") for full crawl
 
   const browser = await puppeteer.launch({ headless: "new" });
 
@@ -41,14 +41,12 @@ async function crawlPlayerIndex() {
         await page.waitForSelector("body");
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        playerLinks = await page.evaluate((letter) => {
-          const header = document.querySelector(`h2#${letter.toUpperCase()}`);
-          if (!header) return [];
-          const table = header.nextElementSibling;
-          if (!table) return [];
-          const links = Array.from(table.querySelectorAll("a[href^='/cbb/players/']"));
+        playerLinks = await page.evaluate(() => {
+          const links = Array.from(
+            document.querySelectorAll("a[href^='/cbb/players/']")
+          );
           return links.map((a) => a.getAttribute("href"));
-        }, letter);
+        });
       } catch (err) {
         console.log(`Letter: ${letter} → failed to load (${err.message})`);
         continue;
@@ -58,6 +56,8 @@ async function crawlPlayerIndex() {
         .filter((href) => href && PLAYER_LINK_REGEX.test(href))
         .map((href) => BASE_ORIGIN + href);
 
+      console.log(`Letter ${letter} raw links: ${(playerLinks || []).length}`);
+      console.log(`Letter ${letter} valid players: ${validPlayers.length}`);
       playerUrls.push(...validPlayers);
       console.log(`Letter: ${letter} → players found: ${validPlayers.length}`);
       await new Promise((resolve) => setTimeout(resolve, 1500));
