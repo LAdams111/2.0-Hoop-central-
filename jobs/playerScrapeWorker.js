@@ -3,7 +3,12 @@ const { scrapePlayer } = require("../scrapers/ncaa/sportsReferencePlayerScraper"
 const browserService = require("../services/browserService");
 
 const DELAY_MS = 500;
+const EMPTY_QUEUE_SLEEP_MS = 2000;
 const STALE_PROCESSING_MINUTES = 10;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 /**
  * Reset jobs stuck in 'processing' (e.g. after crash) so they can be retried.
@@ -22,17 +27,19 @@ async function resetStaleProcessing() {
 }
 
 /**
- * Claim the next pending job (FOR UPDATE SKIP LOCKED) and mark it processing.
+ * Fetch next pending job using row locking so multiple workers don't take the same job.
+ * Marks the job as 'processing' in the same transaction.
  * @returns {Promise<{ id: number, player_url: string } | null>}
  */
-async function claimNextJob() {
+async function getNextPendingJob() {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
     const res = await client.query(
-      `SELECT id, player_url FROM player_scrape_jobs
+      `SELECT *
+       FROM player_scrape_jobs
        WHERE status = 'pending'
-       ORDER BY id ASC
+       ORDER BY id
        LIMIT 1
        FOR UPDATE SKIP LOCKED`
     );
@@ -58,7 +65,7 @@ async function claimNextJob() {
 /**
  * Mark a job complete.
  */
-async function markComplete(jobId) {
+async function markJobComplete(jobId) {
   const { query } = require("../db/db");
   await query(
     "UPDATE player_scrape_jobs SET status = 'complete', updated_at = NOW() WHERE id = $1",
@@ -69,7 +76,7 @@ async function markComplete(jobId) {
 /**
  * Mark a job failed and record error.
  */
-async function markFailed(jobId, error) {
+async function markJobFailed(jobId, error) {
   const { query } = require("../db/db");
   const msg = error && (error.message || String(error));
   await query(
@@ -83,26 +90,30 @@ async function markFailed(jobId, error) {
   );
 }
 
-async function runWorker() {
-  console.log("Player scrape worker started. Processing jobs...");
-  await resetStaleProcessing();
+/**
+ * Single-worker loop: continuously fetch jobs, scrape, update status.
+ * Safe to run multiple times concurrently (pool).
+ * @param {number} [workerId] - Optional id for log prefix (e.g. worker 0..7).
+ */
+async function processJobs(workerId = 0) {
+  const prefix = workerId != null ? `[w${workerId}]` : "";
   while (true) {
     let job = null;
     try {
-      job = await claimNextJob();
+      job = await getNextPendingJob();
       if (!job) {
-        await new Promise((r) => setTimeout(r, 2000));
+        await sleep(EMPTY_QUEUE_SLEEP_MS);
         continue;
       }
-      console.log(`[${job.id}] Processing: ${job.player_url}`);
+      console.log(`${prefix} [${job.id}] Processing: ${job.player_url}`);
       await scrapePlayer(job.player_url);
-      await markComplete(job.id);
-      console.log(`[${job.id}] Complete.`);
+      await markJobComplete(job.id);
+      console.log(`${prefix} [${job.id}] Complete.`);
     } catch (err) {
-      console.error("Worker error:", err);
-      if (job) await markFailed(job.id, err);
+      console.error(`${prefix} Worker error:`, err);
+      if (job) await markJobFailed(job.id, err);
     }
-    await new Promise((r) => setTimeout(r, DELAY_MS));
+    await sleep(DELAY_MS);
   }
 }
 
@@ -118,7 +129,8 @@ async function main() {
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
   try {
-    await runWorker();
+    await resetStaleProcessing();
+    await processJobs();
   } catch (err) {
     console.error("Fatal:", err);
     process.exit(1);
@@ -127,4 +139,8 @@ async function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { processJobs, resetStaleProcessing, sleep, getNextPendingJob, markJobComplete, markJobFailed };
+}
