@@ -10,6 +10,7 @@ require("dotenv").config({ path: require("path").resolve(__dirname, "..", ".env"
 
 const fs = require("fs");
 const path = require("path");
+const ensureSchema = require("../utils/ensureSchema");
 const { query } = require("../db/db");
 
 const TEST_LIMIT = parseInt(process.env.TEST_LIMIT, 10) || 500;
@@ -69,6 +70,11 @@ async function clearAndLoadTestJobs() {
 }
 
 async function main() {
+  const schemaRan = await ensureSchema();
+  if (!schemaRan) {
+    console.log("Starting test batch...");
+  }
+
   await clearAndLoadTestJobs();
   console.log(`Running test scrape with ${TEST_LIMIT} players...\n`);
   require("./runPlayerWorkers");

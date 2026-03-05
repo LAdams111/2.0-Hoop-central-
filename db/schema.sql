@@ -5,7 +5,7 @@
 -- CORE ENTITIES (independent of time/season)
 -- =============================================================================
 
-CREATE TABLE players (
+CREATE TABLE IF NOT EXISTS players (
   id SERIAL PRIMARY KEY,
   full_name TEXT NOT NULL,
   first_name TEXT,
@@ -20,7 +20,7 @@ CREATE TABLE players (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE player_external_ids (
+CREATE TABLE IF NOT EXISTS player_external_ids (
   id SERIAL PRIMARY KEY,
   player_id INT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
   source TEXT NOT NULL,
@@ -28,13 +28,13 @@ CREATE TABLE player_external_ids (
   UNIQUE(source, external_id)
 );
 
-CREATE TABLE leagues (
+CREATE TABLE IF NOT EXISTS leagues (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   country TEXT
 );
 
-CREATE TABLE teams (
+CREATE TABLE IF NOT EXISTS teams (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   city TEXT,
@@ -46,14 +46,14 @@ CREATE TABLE teams (
 -- TIME-BOUND ENTITIES (seasons link leagues and teams)
 -- =============================================================================
 
-CREATE TABLE seasons (
+CREATE TABLE IF NOT EXISTS seasons (
   id SERIAL PRIMARY KEY,
   league_id INT NOT NULL REFERENCES leagues(id),
   year_start INT NOT NULL,
   year_end INT NOT NULL
 );
 
-CREATE TABLE team_seasons (
+CREATE TABLE IF NOT EXISTS team_seasons (
   id SERIAL PRIMARY KEY,
   team_id INT NOT NULL REFERENCES teams(id),
   season_id INT NOT NULL REFERENCES seasons(id),
@@ -65,7 +65,7 @@ CREATE TABLE team_seasons (
 -- PLAYER–TEAM–SEASON (player seasons link players to teams in a season)
 -- =============================================================================
 
-CREATE TABLE player_seasons (
+CREATE TABLE IF NOT EXISTS player_seasons (
   id SERIAL PRIMARY KEY,
   player_id INT NOT NULL REFERENCES players(id),
   team_season_id INT NOT NULL REFERENCES team_seasons(id),
@@ -78,7 +78,7 @@ CREATE TABLE player_seasons (
 -- STATS (belong to player_seasons)
 -- =============================================================================
 
-CREATE TABLE player_season_stats (
+CREATE TABLE IF NOT EXISTS player_season_stats (
   id SERIAL PRIMARY KEY,
   player_season_id INT NOT NULL REFERENCES player_seasons(id) ON DELETE CASCADE,
   games INT,
@@ -111,11 +111,11 @@ CREATE TABLE IF NOT EXISTS player_scrape_jobs (
 -- INDEXES FOR PERFORMANCE
 -- =============================================================================
 
-CREATE INDEX idx_players_full_name ON players(full_name);
-CREATE INDEX idx_player_scrape_jobs_status ON player_scrape_jobs(status);
-CREATE INDEX idx_player_scrape_jobs_pending ON player_scrape_jobs(id) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_players_full_name ON players(full_name);
+CREATE INDEX IF NOT EXISTS idx_player_scrape_jobs_status ON player_scrape_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_player_scrape_jobs_pending ON player_scrape_jobs(id) WHERE status = 'pending';
 -- Unique index on (source, external_id) is created by UNIQUE constraint on player_external_ids
-CREATE INDEX idx_teams_name ON teams(name);
-CREATE INDEX idx_seasons_league_id ON seasons(league_id);
-CREATE INDEX idx_player_seasons_player_id ON player_seasons(player_id);
-CREATE INDEX idx_player_seasons_team_season_id ON player_seasons(team_season_id);
+CREATE INDEX IF NOT EXISTS idx_teams_name ON teams(name);
+CREATE INDEX IF NOT EXISTS idx_seasons_league_id ON seasons(league_id);
+CREATE INDEX IF NOT EXISTS idx_player_seasons_player_id ON player_seasons(player_id);
+CREATE INDEX IF NOT EXISTS idx_player_seasons_team_season_id ON player_seasons(team_season_id);
