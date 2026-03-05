@@ -59,6 +59,34 @@ function parseNumOrNull(text) {
 }
 
 /**
+ * Parse "Born: July 6, 2000 in Salisbury, North Carolina" from meta text.
+ * @returns {{ birth_date: string|null, birth_place: string|null }} ISO date YYYY-MM-DD or null
+ */
+const MONTH_NAMES = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+function parseBorn(metaText) {
+  if (!metaText) return { birth_date: null, birth_place: null };
+  const match = metaText.match(/Born:\s*([^\n]+)/i);
+  if (!match) return { birth_date: null, birth_place: null };
+  const rest = match[1].trim();
+  const inMatch = rest.match(/^(.+?)\s+in\s+(.+)$/);
+  const dateStr = inMatch ? inMatch[1].trim() : rest;
+  const placeStr = inMatch ? inMatch[2].trim() : null;
+  const datePart = dateStr.match(/^(\w+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s*(\d{4})$/i);
+  if (!datePart) return { birth_date: null, birth_place: placeStr };
+  const monthName = datePart[1].toLowerCase();
+  const day = parseInt(datePart[2], 10);
+  const year = datePart[3];
+  const monthIdx = MONTH_NAMES.indexOf(monthName);
+  if (monthIdx === -1) return { birth_date: null, birth_place: placeStr };
+  const month = String(monthIdx + 1).padStart(2, "0");
+  const dayPadded = String(day).padStart(2, "0");
+  return { birth_date: `${year}-${month}-${dayPadded}`, birth_place: placeStr };
+}
+
+/**
  * Parse float from table cell (for pts_per_g, trb_per_g, ast_per_g).
  */
 function parseFloatOrNull(text) {
@@ -130,22 +158,32 @@ async function scrapePlayer(url) {
   const meta = $("#meta");
   let height_cm = null;
   let weight_kg = null;
+  let birth_date = null;
+  let birth_place = null;
   if (meta.length) {
     const metaText = meta.text();
     const hwMatch = metaText.match(/(\d+-\d+)\s*,\s*(\d+)\s*lb/i) || metaText.match(/(\d+-\d+)\s*,\s*(\d+)\s*kg/i);
     if (hwMatch) {
       height_cm = ftInToCm(hwMatch[1].trim());
-      weight_kg = metaText.match(/\d+\s*kg/i) ? parseInt(hwMatch[2], 10) : lbsToKg(hwMatch[2]);
+      const weightVal = metaText.match(/\d+\s*kg/i) ? parseInt(hwMatch[2], 10) : lbsToKg(hwMatch[2]);
+      weight_kg = weightVal != null ? Math.round(Number(weightVal)) : null;
     }
+    const born = parseBorn(metaText);
+    birth_date = born.birth_date;
+    birth_place = born.birth_place;
   }
+  const dataBirth = $("#necro-birth").attr("data-birth");
+  if (dataBirth) birth_date = dataBirth;
 
-  // --- Create player ---
+  // --- Create player (only schema columns: no school or other non-DB fields) ---
   const sr_player_id = getExternalIdFromUrl(url);
   const player = await findOrCreatePlayer({
     full_name: fullName,
     sr_player_id: sr_player_id ?? null,
     first_name: first_name || null,
     last_name: last_name,
+    birth_date: birth_date ?? null,
+    birth_place: birth_place ?? null,
     height_cm: height_cm ?? null,
     weight_kg: weight_kg ?? null,
     position: null,

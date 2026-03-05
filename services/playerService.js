@@ -8,14 +8,27 @@ const { query } = require("../db/db");
  * @param {string} [playerData.sr_player_id] - Sports Reference player ID (e.g. "zion-williamson-1")
  * @param {string} [playerData.first_name]
  * @param {string} [playerData.last_name]
+ * @param {string} [playerData.birth_date] - ISO date YYYY-MM-DD
+ * @param {string} [playerData.birth_place]
  * @param {number} [playerData.height_cm]
  * @param {number} [playerData.weight_kg]
  * @param {string} [playerData.position]
+ * @param {string} [playerData.nationality]
  * @returns {Promise<{ id: number, full_name: string, ... }>}
  */
 async function findOrCreatePlayer(playerData) {
-  const { full_name, sr_player_id, first_name, last_name, height_cm, weight_kg, position } =
-    playerData;
+  const {
+    full_name,
+    sr_player_id,
+    first_name,
+    last_name,
+    birth_date,
+    birth_place,
+    height_cm,
+    weight_kg,
+    position,
+    nationality,
+  } = playerData;
 
   if (sr_player_id) {
     const existing = await query(
@@ -32,11 +45,22 @@ async function findOrCreatePlayer(playerData) {
   if (existingByName.rows.length > 0) return existingByName.rows[0];
 
   const insert = await query(
-    `INSERT INTO players (full_name, first_name, last_name, height_cm, weight_kg, position, sr_player_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO players (full_name, first_name, last_name, birth_date, birth_place, position, height_cm, weight_kg, sr_player_id, nationality)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT (sr_player_id) DO NOTHING
      RETURNING *`,
-    [full_name, first_name ?? null, last_name ?? null, height_cm ?? null, weight_kg ?? null, position ?? null, sr_player_id ?? null]
+    [
+      full_name,
+      first_name ?? null,
+      last_name ?? null,
+      birth_date ?? null,
+      birth_place ?? null,
+      position ?? null,
+      height_cm ?? null,
+      weight_kg ?? null,
+      sr_player_id ?? null,
+      nationality ?? null,
+    ]
   );
 
   if (insert.rows.length > 0) return insert.rows[0];
