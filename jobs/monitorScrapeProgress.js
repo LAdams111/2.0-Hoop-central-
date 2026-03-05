@@ -6,7 +6,8 @@
  * Dashboard updates every 5 seconds. Exits when scrape is complete.
  */
 
-require("dotenv").config();
+require("dotenv").config({ path: require("path").resolve(__dirname, "..", ".env") });
+
 const { query } = require("../db/db");
 
 const INTERVAL_MS = 5000;
@@ -91,8 +92,9 @@ async function run() {
     }
   };
 
-  if (!process.env.DATABASE_URL) {
-    console.error("DATABASE_URL is not set.");
+  const DATABASE_URL = process.env.DATABASE_URL;
+  if (!DATABASE_URL) {
+    console.error("DATABASE_URL is not set. Add it to .env in the project root.");
     process.exit(1);
   }
 

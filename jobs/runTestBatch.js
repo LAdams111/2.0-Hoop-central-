@@ -9,17 +9,19 @@
  * Optional: TEST_LIMIT=200 node jobs/runTestBatch.js
  */
 
+require("dotenv").config({ path: require("path").resolve(__dirname, "..", ".env") });
+
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
 const { query } = require("../db/db");
 
 const TEST_LIMIT = parseInt(process.env.TEST_LIMIT, 10) || 500;
 const URLS_PATH = path.resolve(__dirname, "../data/player_urls.json");
 
 async function clearAndLoadTestJobs() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not set.");
+  const DATABASE_URL = process.env.DATABASE_URL;
+  if (!DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set. Add it to .env in the project root.");
   }
 
   let urls = [];

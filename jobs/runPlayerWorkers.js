@@ -1,9 +1,16 @@
+require("dotenv").config({ path: require("path").resolve(__dirname, "..", ".env") });
+
 const browserService = require("../services/browserService");
 const { processJobs, resetStaleProcessing } = require("./playerScrapeWorker");
 
 const WORKER_COUNT = 8;
 
 async function main() {
+  const DATABASE_URL = process.env.DATABASE_URL;
+  if (!DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set. Add it to .env in the project root.");
+  }
+
   let running = true;
   const shutdown = async () => {
     if (!running) return;
