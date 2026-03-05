@@ -12,6 +12,7 @@ const {
   createPlayerSeason,
 } = require("../../services/playerSeasonService");
 const { query } = require("../../db/db");
+const { ftInToCm, lbsToKg } = require("../../utils/heightWeight");
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -116,13 +117,25 @@ async function scrapePlayer(url) {
   const first_name = lastSpace > 0 ? fullName.slice(0, lastSpace).trim() : fullName;
   const last_name = lastSpace > 0 ? fullName.slice(lastSpace + 1).trim() : null;
 
+  const meta = $("#meta");
+  let height_cm = null;
+  let weight_kg = null;
+  if (meta.length) {
+    const metaText = meta.text();
+    const hwMatch = metaText.match(/(\d+-\d+)\s*,\s*(\d+)\s*lb/i) || metaText.match(/(\d+-\d+)\s*,\s*(\d+)\s*kg/i);
+    if (hwMatch) {
+      height_cm = ftInToCm(hwMatch[1].trim());
+      weight_kg = metaText.match(/\d+\s*kg/i) ? parseInt(hwMatch[2], 10) : lbsToKg(hwMatch[2]);
+    }
+  }
+
   // --- Create player ---
   const player = await findOrCreatePlayer({
     full_name: fullName,
     first_name: first_name || null,
     last_name: last_name,
-    height_cm: null,
-    weight_kg: null,
+    height_cm: height_cm ?? null,
+    weight_kg: weight_kg ?? null,
     position: null,
   });
 
