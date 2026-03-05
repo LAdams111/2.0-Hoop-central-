@@ -126,6 +126,10 @@ async function scrapePlayerPage(playerUrl) {
   const cleanedHtml = unwrapComments(html);
   const $ = cheerio.load(cleanedHtml);
 
+  // --- Birth date from hidden attribute (Sports Reference uses #necro-birth data-birth) ---
+  const birthDate = $("#necro-birth").attr("data-birth") || null;
+  if (birthDate) player.birth_date = birthDate;
+
   // --- Player name from h1 span: split into first_name and last_name ---
   const nameText = getText($, $("h1").first(), "span") || getText($, $("h1").first());
   const fullName = (nameText || "").trim();
@@ -155,7 +159,7 @@ async function scrapePlayerPage(playerUrl) {
       player.weight = getMeta("Weight") || null;
     }
     const born = parseBorn(metaText);
-    player.birth_date = born.birth_date;
+    if (!player.birth_date) player.birth_date = born.birth_date;
     player.birth_place = born.birth_place;
     if (!player.birth_place) player.birth_place = getMeta("Hometown") || null;
     const lines = metaText.split(/\n/);
@@ -168,6 +172,27 @@ async function scrapePlayerPage(playerUrl) {
     }
     if (player.school) {
       player.school = player.school.replace(/\s*\((?:Men|Women)\)\s*$/i, "").trim() || player.school;
+    }
+  }
+
+  // --- Fallback: if no data-birth on CBB page, try NBA player page (has data-birth in HTML) ---
+  if (player.birth_date == null) {
+    const nbaLink = $(`a[href*="basketball-reference.com/players/"]`).first().attr("href");
+    if (nbaLink) {
+      const nbaUrl = nbaLink.startsWith("http") ? nbaLink : `https://www.basketball-reference.com${nbaLink.startsWith("/") ? nbaLink : "/" + nbaLink}`;
+      try {
+        const b2 = await puppeteer.launch({ headless: "new" });
+        const p2 = await b2.newPage();
+        await p2.setUserAgent(
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        );
+        await p2.goto(nbaUrl, { waitUntil: "domcontentloaded", timeout: 15000 });
+        await new Promise((r) => setTimeout(r, 1500));
+        const nbaHtml = await p2.content();
+        await b2.close();
+        const dataBirth = nbaHtml.match(/data-birth="(\d{4}-\d{2}-\d{2})"/);
+        if (dataBirth) player.birth_date = dataBirth[1];
+      } catch (_) {}
     }
   }
 
