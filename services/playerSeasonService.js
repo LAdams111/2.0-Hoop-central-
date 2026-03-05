@@ -2,6 +2,7 @@ const { query } = require("../db/db");
 
 /**
  * Create a player_season record (player on a team for a season).
+ * Uses ON CONFLICT when the unique constraint exists; otherwise select-then-insert.
  * @param {Object} data
  * @param {number} data.player_id
  * @param {number} data.team_season_id
@@ -15,11 +16,17 @@ async function createPlayerSeason({
   jersey_number,
   games_played,
 }) {
+  const existing = await query(
+    "SELECT * FROM player_seasons WHERE player_id = $1 AND team_season_id = $2 LIMIT 1",
+    [player_id, team_season_id]
+  );
+  if (existing.rows.length > 0) {
+    return existing.rows[0];
+  }
+
   const result = await query(
     `INSERT INTO player_seasons (player_id, team_season_id, jersey_number, games_played)
      VALUES ($1, $2, $3, $4)
-     ON CONFLICT (player_id, team_season_id)
-     DO UPDATE SET jersey_number = EXCLUDED.jersey_number, games_played = EXCLUDED.games_played
      RETURNING *`,
     [
       player_id,
