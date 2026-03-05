@@ -16,6 +16,7 @@ CREATE TABLE players (
   weight_kg INT,
   position TEXT,
   nationality TEXT,
+  sr_player_id TEXT UNIQUE,
   created_at TIMESTAMP DEFAULT NOW()
 );
 

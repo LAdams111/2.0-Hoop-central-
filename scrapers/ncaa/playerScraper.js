@@ -2,6 +2,15 @@ const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 
 /**
+ * Extract Sports Reference player ID from player page URL.
+ * e.g. "https://www.sports-reference.com/cbb/players/zion-williamson-1.html" -> "zion-williamson-1"
+ */
+function extractPlayerId(url) {
+  if (!url || typeof url !== "string") return null;
+  return url.split("/").pop().replace(".html", "");
+}
+
+/**
  * Replaces HTML comment delimiters so Sports Reference's comment-wrapped tables
  * become visible to Cheerio. Does not remove the comment content.
  * @param {string} html - Raw HTML string
@@ -92,6 +101,7 @@ function parseBorn(metaText) {
  */
 async function scrapePlayerPage(playerUrl) {
   const player = {
+    sr_player_id: extractPlayerId(playerUrl),
     first_name: null,
     last_name: null,
     position: null,
@@ -244,4 +254,5 @@ async function scrapePlayerPage(playerUrl) {
 module.exports = {
   unwrapComments,
   scrapePlayerPage,
+  extractPlayerId,
 };

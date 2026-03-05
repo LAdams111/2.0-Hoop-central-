@@ -130,8 +130,10 @@ async function scrapePlayer(url) {
   }
 
   // --- Create player ---
+  const sr_player_id = getExternalIdFromUrl(url);
   const player = await findOrCreatePlayer({
     full_name: fullName,
+    sr_player_id: sr_player_id ?? null,
     first_name: first_name || null,
     last_name: last_name,
     height_cm: height_cm ?? null,
