@@ -11,6 +11,7 @@ CREATE TABLE players (
   first_name TEXT,
   last_name TEXT,
   birth_date DATE,
+  birth_place TEXT,
   height_cm INT,
   weight_kg INT,
   position TEXT,

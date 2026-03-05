@@ -66,6 +66,7 @@ async function scrapePlayerPage(playerUrl) {
     height: null,
     weight: null,
     school: null,
+    birth_place: null,
     seasons: [],
   };
 
@@ -96,7 +97,7 @@ async function scrapePlayerPage(playerUrl) {
   const nameText = getText($, $("h1").first(), "span") || getText($, $("h1").first());
   result.name = nameText || "Unknown";
 
-  // --- #meta section: position, height, weight, school ---
+  // --- #meta section: position, height, weight, school, birth_place (site label: "Hometown") ---
   const meta = $("#meta");
   if (meta.length) {
     const metaText = meta.text();
@@ -127,6 +128,8 @@ async function scrapePlayerPage(playerUrl) {
     if (result.school) {
       result.school = result.school.replace(/\s*\((?:Men|Women)\)\s*$/i, "").trim() || result.school;
     }
+    // Birth place: Sports Reference labels this "Hometown" (e.g. "Salisbury, North Carolina")
+    result.birth_place = getMeta("Hometown") || null;
   }
 
   // --- Per-game table #players_per_game ---
