@@ -60,6 +60,7 @@ const MONTH_NAMES = [
  * Parse "Born: July 6, 2000 in Salisbury, North Carolina" into
  * { birth_date: "2000-07-06", birth_place: "Salisbury, North Carolina" }.
  * If no " in " present, birth_place is null. Handles "July 6, 2000" or "July 6th, 2000".
+ * Note: Some CBB pages (e.g. Zion Williamson) do not include "Born:" in the meta HTML at all, so birth_date stays null.
  */
 function parseBorn(metaText) {
   const match = metaText.match(/Born:\s*([^\n]+)/i);
