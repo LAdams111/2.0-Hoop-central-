@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const { query } = require("../../db/db");
 
 const BASE = "https://www.sports-reference.com";
 /** Profile URLs: /cbb/players/{slug}-{number}.html — allow apostrophes etc. in slug */
@@ -81,6 +82,18 @@ async function crawlPlayerIndex() {
 
     const allUnique = Array.from(new Set(playerUrls));
     console.log("Total players discovered:", allUnique.length);
+
+    // Insert URLs into job queue for resumable scraping (skip duplicates)
+    const BATCH = 2000;
+    for (let i = 0; i < allUnique.length; i += BATCH) {
+      const batch = allUnique.slice(i, i + BATCH);
+      await query(
+        "INSERT INTO player_scrape_jobs (player_url) SELECT unnest($1::text[]) ON CONFLICT (player_url) DO NOTHING",
+        [batch]
+      );
+      console.log(`Queued jobs: ${Math.min(i + BATCH, allUnique.length)} / ${allUnique.length}`);
+    }
+
     console.log("First 10 players:", allUnique.slice(0, 10));
     return allUnique;
   } finally {

@@ -93,10 +93,26 @@ CREATE TABLE player_season_stats (
 );
 
 -- =============================================================================
+-- SCRAPE JOB QUEUE (resumable NCAA player ingestion)
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS player_scrape_jobs (
+  id SERIAL PRIMARY KEY,
+  player_url TEXT UNIQUE NOT NULL,
+  status TEXT DEFAULT 'pending',
+  attempts INTEGER DEFAULT 0,
+  last_error TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- =============================================================================
 -- INDEXES FOR PERFORMANCE
 -- =============================================================================
 
 CREATE INDEX idx_players_full_name ON players(full_name);
+CREATE INDEX idx_player_scrape_jobs_status ON player_scrape_jobs(status);
+CREATE INDEX idx_player_scrape_jobs_pending ON player_scrape_jobs(id) WHERE status = 'pending';
 -- Unique index on (source, external_id) is created by UNIQUE constraint on player_external_ids
 CREATE INDEX idx_teams_name ON teams(name);
 CREATE INDEX idx_seasons_league_id ON seasons(league_id);
