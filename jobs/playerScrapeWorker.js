@@ -2,8 +2,8 @@ const { pool } = require("../db/db");
 const { scrapePlayer } = require("../scrapers/ncaa/sportsReferencePlayerScraper");
 const browserService = require("../services/browserService");
 
-const DELAY_MS_MIN = 800;
-const DELAY_MS_MAX = 1200;
+const DELAY_MS_MIN = 700;
+const DELAY_MS_MAX = 900;
 const EMPTY_QUEUE_SLEEP_MS = 2000;
 const STALE_PROCESSING_MINUTES = 10;
 const MAX_ATTEMPTS = 3;

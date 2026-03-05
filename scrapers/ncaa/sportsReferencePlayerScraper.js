@@ -18,6 +18,9 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const MAX_429_RETRIES = 3;
+const RATE_LIMIT_WAIT_MS = 3000;
+
 /**
  * Parse "2018-19" into { year_start: 2018, year_end: 2019 }.
  */
@@ -123,19 +126,44 @@ async function scrapePlayer(url) {
       }
     });
 
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
+    for (let attempt = 1; attempt <= MAX_429_RETRIES; attempt++) {
+      const response = await page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
 
-    await page.waitForSelector("#players_per_game tbody tr", {
-      timeout: 8000,
-    }).catch(() => {});
+      if (response && response.status() === 429) {
+        console.log("Rate limited (429). Waiting 3s then retrying...");
+        await delay(RATE_LIMIT_WAIT_MS);
+        if (attempt === MAX_429_RETRIES) {
+          throw new Error("Rate limited (429) after " + MAX_429_RETRIES + " retries");
+        }
+        continue;
+      }
 
-    html = await page.content();
+      await page.waitForSelector("#players_per_game tbody tr", {
+        timeout: 8000,
+      }).catch(() => {});
+
+      html = await page.content();
+
+      const cleanedCheck = html.replace(/<!--/g, "").replace(/-->/g, "");
+      const $check = cheerio.load(cleanedCheck);
+      const titleOrH1 = ($check("h1").first().text() || $check("title").text() || "").trim();
+      if (/429|Rate Limited/i.test(titleOrH1)) {
+        console.log("Rate limited (429) in page body. Waiting 3s then retrying...");
+        await delay(RATE_LIMIT_WAIT_MS);
+        if (attempt === MAX_429_RETRIES) {
+          throw new Error("Rate limited (429) after " + MAX_429_RETRIES + " retries");
+        }
+        continue;
+      }
+
+      break;
+    }
   } catch (err) {
     console.error("Failed to fetch player page:", err.message);
-    return null;
+    throw err;
   } finally {
     if (page) await page.close();
   }
