@@ -85,6 +85,16 @@ async function scrapePlayer(url) {
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     );
 
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const type = req.resourceType();
+      if (type === "image" || type === "stylesheet" || type === "font") {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+
     await page.goto(url, {
       waitUntil: "domcontentloaded",
       timeout: 30000,

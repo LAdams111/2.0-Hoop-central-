@@ -18,6 +18,8 @@ async function createPlayerSeason({
   const result = await query(
     `INSERT INTO player_seasons (player_id, team_season_id, jersey_number, games_played)
      VALUES ($1, $2, $3, $4)
+     ON CONFLICT (player_id, team_season_id)
+     DO UPDATE SET jersey_number = EXCLUDED.jersey_number, games_played = EXCLUDED.games_played
      RETURNING *`,
     [
       player_id,

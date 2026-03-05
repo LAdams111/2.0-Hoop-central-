@@ -20,7 +20,15 @@ async function main() {
 
   const workers = [];
   for (let i = 0; i < WORKER_COUNT; i++) {
-    workers.push(processJobs(i));
+    workers.push(
+      (async () => {
+        try {
+          await processJobs(i);
+        } catch (err) {
+          console.error(`Worker ${i} crashed:`, err);
+        }
+      })()
+    );
   }
   await Promise.all(workers);
 }

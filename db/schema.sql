@@ -70,7 +70,8 @@ CREATE TABLE player_seasons (
   player_id INT NOT NULL REFERENCES players(id),
   team_season_id INT NOT NULL REFERENCES team_seasons(id),
   jersey_number INT,
-  games_played INT
+  games_played INT,
+  UNIQUE (player_id, team_season_id)
 );
 
 -- =============================================================================
