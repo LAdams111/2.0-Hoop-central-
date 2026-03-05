@@ -19,6 +19,31 @@ function rateLimitDelay() {
 }
 
 /**
+ * Extract Sports Reference player ID from URL.
+ * e.g. "https://.../cbb/players/zion-williamson-1.html" -> "zion-williamson-1"
+ */
+function extractPlayerId(url) {
+  if (!url || typeof url !== "string") return null;
+  const segment = url.split("/").pop();
+  return segment ? segment.replace(".html", "") : null;
+}
+
+/**
+ * Check if a player already exists in the database (cache check).
+ * @param {string} sr_player_id - Sports Reference player ID
+ * @returns {Promise<boolean>}
+ */
+async function playerExists(sr_player_id) {
+  if (!sr_player_id) return false;
+  const { query } = require("../db/db");
+  const res = await query(
+    "SELECT id FROM players WHERE sr_player_id = $1 LIMIT 1",
+    [sr_player_id]
+  );
+  return res.rowCount > 0;
+}
+
+/**
  * Reset jobs stuck in 'processing' (e.g. after crash) so they can be retried.
  */
 async function resetStaleProcessing() {
@@ -130,6 +155,20 @@ async function processJobs(workerId = 0) {
           continue;
         }
         console.log(`${prefix} [${job.id}] Processing: ${job.player_url}`);
+        const sr_player_id = extractPlayerId(job.player_url);
+        if (sr_player_id) {
+          const exists = await playerExists(sr_player_id);
+          if (exists) {
+            await markJobComplete(job.id);
+            jobsProcessed += 1;
+            console.log(`${prefix} [${job.id}] Skipping already scraped player: ${sr_player_id}`);
+            if (jobsProcessed % PROGRESS_LOG_EVERY_JOBS === 0) {
+              await logProgressCounts();
+            }
+            await rateLimitDelay();
+            continue;
+          }
+        }
         await scrapePlayer(job.player_url);
         await markJobComplete(job.id);
         jobsProcessed += 1;
