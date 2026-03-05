@@ -1,5 +1,7 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const path = require("path");
+const fs = require("fs");
 const { query } = require("../../db/db");
 
 const BASE = "https://www.sports-reference.com";
@@ -9,9 +11,12 @@ const PLAYER_LINK_REGEX = /^\/cbb\/players\/.*-\d+\.html$/;
 /**
  * Crawl Sports Reference NCAA player index by letter and collect all player profile URLs.
  * Uses Puppeteer to fetch, unwraps HTML comments in the page DOM, then collects player links.
+ * @param {Object} [opts]
+ * @param {boolean} [opts.saveToDb=true] - If true, insert URLs into player_scrape_jobs.
  * @returns {Promise<string[]>} Full URLs for each player page (deduplicated)
  */
-async function crawlPlayerIndex() {
+async function crawlPlayerIndex(opts = {}) {
+  const saveToDb = opts.saveToDb !== false;
   const playerUrls = [];
   const letters = "abcdefghijklmnopqrstuvwxyz".split("");
 
@@ -83,15 +88,17 @@ async function crawlPlayerIndex() {
     const allUnique = Array.from(new Set(playerUrls));
     console.log("Total players discovered:", allUnique.length);
 
-    // Insert URLs into job queue for resumable scraping (skip duplicates)
-    const BATCH = 2000;
-    for (let i = 0; i < allUnique.length; i += BATCH) {
-      const batch = allUnique.slice(i, i + BATCH);
-      await query(
-        "INSERT INTO player_scrape_jobs (player_url) SELECT unnest($1::text[]) ON CONFLICT (player_url) DO NOTHING",
-        [batch]
-      );
-      console.log(`Queued jobs: ${Math.min(i + BATCH, allUnique.length)} / ${allUnique.length}`);
+    if (saveToDb) {
+      // Insert URLs into job queue for resumable scraping (skip duplicates)
+      const BATCH = 2000;
+      for (let i = 0; i < allUnique.length; i += BATCH) {
+        const batch = allUnique.slice(i, i + BATCH);
+        await query(
+          "INSERT INTO player_scrape_jobs (player_url) SELECT unnest($1::text[]) ON CONFLICT (player_url) DO NOTHING",
+          [batch]
+        );
+        console.log(`Queued jobs: ${Math.min(i + BATCH, allUnique.length)} / ${allUnique.length}`);
+      }
     }
 
     console.log("First 10 players:", allUnique.slice(0, 10));
@@ -101,4 +108,23 @@ async function crawlPlayerIndex() {
   }
 }
 
-module.exports = { crawlPlayerIndex };
+/**
+ * Crawl the player index and save URLs to data/player_urls.json (no DB insert).
+ * Use this to generate the URL list for test batches.
+ */
+async function crawlAndSavePlayerUrls() {
+  console.log("Crawling Sports Reference player index...");
+  const urls = await crawlPlayerIndex({ saveToDb: false });
+
+  const dataDir = path.resolve(__dirname, "../../data");
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  const filePath = path.join(dataDir, "player_urls.json");
+  fs.writeFileSync(filePath, JSON.stringify(urls, null, 2));
+  console.log(`Saved ${urls.length} player URLs to data/player_urls.json`);
+  return urls;
+}
+
+module.exports = { crawlPlayerIndex, crawlAndSavePlayerUrls };

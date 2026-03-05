@@ -1,9 +1,6 @@
 /**
  * Run a limited test batch of player scrape jobs before the full dataset.
- * Loads URLs from data/player_urls.json, inserts first 500 (or TEST_LIMIT), then starts workers.
- *
- * Prerequisite: Save crawler output to data/player_urls.json, e.g.:
- *   node -e "require('./scrapers/ncaa/playerIndexCrawler').crawlPlayerIndex().then(u => require('fs').writeFileSync('data/player_urls.json', JSON.stringify(u, null, 2)))"
+ * Loads URLs from data/player_urls.json (runs crawler first if file is missing).
  *
  * Run: node jobs/runTestBatch.js
  * Optional: TEST_LIMIT=200 node jobs/runTestBatch.js
@@ -16,7 +13,8 @@ const path = require("path");
 const { query } = require("../db/db");
 
 const TEST_LIMIT = parseInt(process.env.TEST_LIMIT, 10) || 500;
-const URLS_PATH = path.resolve(__dirname, "../data/player_urls.json");
+const DATA_DIR = path.resolve(__dirname, "../data");
+const URLS_PATH = path.join(DATA_DIR, "player_urls.json");
 
 async function clearAndLoadTestJobs() {
   const DATABASE_URL =
@@ -28,17 +26,22 @@ async function clearAndLoadTestJobs() {
     throw new Error("DATABASE_URL is not set. Add it to .env in the project root.");
   }
 
-  let urls = [];
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(URLS_PATH)) {
+    console.log("Player URL list missing. Running crawler...");
+    const { crawlAndSavePlayerUrls } = require("../scrapers/ncaa/playerIndexCrawler");
+    await crawlAndSavePlayerUrls();
+  }
+
+  const raw = fs.readFileSync(URLS_PATH, "utf8");
+  let urls;
   try {
-    const raw = fs.readFileSync(URLS_PATH, "utf8");
     urls = JSON.parse(raw);
   } catch (err) {
-    if (err.code === "ENOENT") {
-      throw new Error(
-        `Missing data/player_urls.json. Run the crawler and save URLs first, e.g.:\n  node -e "require('./scrapers/ncaa/playerIndexCrawler').crawlPlayerIndex().then(u => require('fs').writeFileSync('data/player_urls.json', JSON.stringify(u, null, 2)))"`
-      );
-    }
-    throw err;
+    throw new Error("data/player_urls.json is not valid JSON: " + err.message);
   }
 
   if (!Array.isArray(urls)) {
