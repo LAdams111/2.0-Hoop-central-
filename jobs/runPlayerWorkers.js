@@ -1,9 +1,19 @@
+/**
+ * Run the player scrape worker pool. Processes the full player_scrape_jobs queue
+ * until no pending jobs remain (mark processing → scrape → complete/failed).
+ *
+ * Usage:
+ *   1. Generate jobs: node jobs/generatePlayerJobs.js
+ *   2. Check queue:   node jobs/checkQueueSize.js
+ *   3. Start workers: node jobs/runPlayerWorkers.js
+ */
+
 require("dotenv").config({ path: require("path").resolve(__dirname, "..", ".env") });
 
 const browserService = require("../services/browserService");
 const { processJobs, resetStaleProcessing } = require("./playerScrapeWorker");
 
-const WORKER_COUNT = 8;
+const WORKER_COUNT = 3;
 
 async function main() {
   const DATABASE_URL =

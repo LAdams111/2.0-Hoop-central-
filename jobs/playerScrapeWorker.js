@@ -2,8 +2,7 @@ const { pool } = require("../db/db");
 const { scrapePlayer } = require("../scrapers/ncaa/sportsReferencePlayerScraper");
 const browserService = require("../services/browserService");
 
-const DELAY_MS_MIN = 700;
-const DELAY_MS_MAX = 900;
+/** Delay between requests (1.5–2.5s with jitter) to avoid rate limits. */
 const EMPTY_QUEUE_SLEEP_MS = 2000;
 const STALE_PROCESSING_MINUTES = 10;
 const MAX_ATTEMPTS = 3;
@@ -13,9 +12,14 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/** Random delay 0.8–1.2s between requests to avoid hammering the site. */
+/** Random delay 2–4 seconds so requests are not predictable. */
+function randomDelay() {
+  return 2000 + Math.random() * 2000;
+}
+
+/** Delay between requests to avoid rate limits. */
 function rateLimitDelay() {
-  return sleep(DELAY_MS_MIN + Math.random() * (DELAY_MS_MAX - DELAY_MS_MIN));
+  return sleep(randomDelay());
 }
 
 /**
@@ -126,6 +130,24 @@ async function markJobFailed(jobId, error, currentAttempts = 0) {
 }
 
 /**
+ * Mark a job as failed (status = 'failed') so it can be retried later via retryFailedJobs.js.
+ * Use for 429 skips and other cases where we do not want automatic requeue.
+ */
+async function markJobFailedPermanent(jobId, error) {
+  const { query } = require("../db/db");
+  const msg = error && (error.message || String(error));
+  await query(
+    `UPDATE player_scrape_jobs SET
+       status = 'failed',
+       attempts = attempts + 1,
+       last_error = $2,
+       updated_at = NOW()
+     WHERE id = $1`,
+    [jobId, msg]
+  );
+}
+
+/**
  * Log job counts by status to console (for progress monitoring).
  */
 async function logProgressCounts() {
@@ -145,6 +167,9 @@ async function logProgressCounts() {
 async function processJobs(workerId = 0) {
   const prefix = workerId != null ? `[w${workerId}]` : "";
   let jobsProcessed = 0;
+
+  await sleep(Math.random() * 5000);
+
   while (true) {
     try {
       let job = null;
@@ -178,7 +203,13 @@ async function processJobs(workerId = 0) {
         }
       } catch (err) {
         console.error(`${prefix} Worker error:`, err);
-        if (job) await markJobFailed(job.id, err, job.attempts);
+        if (job) {
+          if (/Skipped due to repeated 429/i.test(err && err.message)) {
+            await markJobFailedPermanent(job.id, err);
+          } else {
+            await markJobFailed(job.id, err, job.attempts);
+          }
+        }
       }
       await rateLimitDelay();
     } catch (err) {

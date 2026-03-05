@@ -18,8 +18,12 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const MAX_429_RETRIES = 3;
-const RATE_LIMIT_WAIT_MS = 3000;
+/** Retry same player up to 2 times (3 attempts total) on 429. */
+const MAX_429_RETRIES = 2;
+/** Per-request backoff on 429: 8–12 seconds. */
+function rateLimitBackoffMs() {
+  return 8000 + Math.random() * 4000;
+}
 
 /**
  * Parse "2018-19" into { year_start: 2018, year_end: 2019 }.
@@ -113,8 +117,11 @@ async function scrapePlayer(url) {
   try {
     page = await browserService.getPage();
     await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36"
     );
+    await page.setExtraHTTPHeaders({
+      "accept-language": "en-US,en;q=0.9",
+    });
 
     await page.setRequestInterception(true);
     page.on("request", (req) => {
@@ -126,18 +133,19 @@ async function scrapePlayer(url) {
       }
     });
 
-    for (let attempt = 1; attempt <= MAX_429_RETRIES; attempt++) {
+    for (let attempt = 1; attempt <= MAX_429_RETRIES + 1; attempt++) {
       const response = await page.goto(url, {
         waitUntil: "domcontentloaded",
         timeout: 30000,
       });
 
       if (response && response.status() === 429) {
-        console.log("Rate limited (429). Waiting 3s then retrying...");
-        await delay(RATE_LIMIT_WAIT_MS);
-        if (attempt === MAX_429_RETRIES) {
-          throw new Error("Rate limited (429) after " + MAX_429_RETRIES + " retries");
+        if (attempt > MAX_429_RETRIES) {
+          console.log("Skipping player due to repeated 429:", url);
+          throw new Error("Skipped due to repeated 429");
         }
+        console.log("Rate limited. Backing off 10 seconds...");
+        await delay(rateLimitBackoffMs());
         continue;
       }
 
@@ -151,25 +159,20 @@ async function scrapePlayer(url) {
       const $check = cheerio.load(cleanedCheck);
       const titleOrH1 = ($check("h1").first().text() || $check("title").text() || "").trim();
       if (/429|Rate Limited/i.test(titleOrH1)) {
-        console.log("Rate limited (429) in page body. Waiting 3s then retrying...");
-        await delay(RATE_LIMIT_WAIT_MS);
-        if (attempt === MAX_429_RETRIES) {
-          throw new Error("Rate limited (429) after " + MAX_429_RETRIES + " retries");
+        if (attempt > MAX_429_RETRIES) {
+          console.log("Skipping player due to repeated 429:", url);
+          throw new Error("Skipped due to repeated 429");
         }
+        console.log("Rate limited. Backing off 10 seconds...");
+        await delay(rateLimitBackoffMs());
         continue;
       }
 
       break;
     }
-  } catch (err) {
-    console.error("Failed to fetch player page:", err.message);
-    throw err;
-  } finally {
-    if (page) await page.close();
-  }
 
-  const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
-  const $ = cheerio.load(cleanedHtml);
+    const cleanedHtml = html.replace(/<!--/g, "").replace(/-->/g, "");
+    const $ = cheerio.load(cleanedHtml);
 
   // --- Player name (h1 span or h1) ---
   const fullName =
@@ -321,6 +324,15 @@ async function scrapePlayer(url) {
   }
 
   return { player: { name: fullName }, seasons };
+  } catch (err) {
+    console.log("Worker warning: page crashed or failed for:", url);
+    console.log(err.message);
+    return null;
+  } finally {
+    try {
+      if (page) await page.close();
+    } catch (_) {}
+  }
 }
 
 module.exports = { scrapePlayer };
