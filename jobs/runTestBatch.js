@@ -19,7 +19,11 @@ const TEST_LIMIT = parseInt(process.env.TEST_LIMIT, 10) || 500;
 const URLS_PATH = path.resolve(__dirname, "../data/player_urls.json");
 
 async function clearAndLoadTestJobs() {
-  const DATABASE_URL = process.env.DATABASE_URL;
+  const DATABASE_URL =
+    process.env.DATABASE_URL ||
+    (process.env.RAILWAY_ENVIRONMENT
+      ? process.env.DATABASE_URL_INTERNAL
+      : process.env.DATABASE_URL_PUBLIC);
   if (!DATABASE_URL) {
     throw new Error("DATABASE_URL is not set. Add it to .env in the project root.");
   }

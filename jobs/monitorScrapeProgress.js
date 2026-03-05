@@ -92,7 +92,11 @@ async function run() {
     }
   };
 
-  const DATABASE_URL = process.env.DATABASE_URL;
+  const DATABASE_URL =
+    process.env.DATABASE_URL ||
+    (process.env.RAILWAY_ENVIRONMENT
+      ? process.env.DATABASE_URL_INTERNAL
+      : process.env.DATABASE_URL_PUBLIC);
   if (!DATABASE_URL) {
     console.error("DATABASE_URL is not set. Add it to .env in the project root.");
     process.exit(1);
