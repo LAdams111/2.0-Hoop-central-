@@ -1,5 +1,6 @@
+import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Router, Route, Switch } from "wouter";
+import { Router, Route, Switch, useLocation } from "wouter";
 import { Navigation } from "@/components/Navigation";
 import { AdminLock } from "@/components/AdminLock";
 import { HomePage } from "@/pages/HomePage";
@@ -12,7 +13,6 @@ import { ScraperPage } from "@/pages/ScraperPage";
 import { BirthYearPage } from "@/pages/BirthYearPage";
 import { ProspectsPage } from "@/pages/ProspectsPage";
 import { FavoritesPage } from "@/pages/FavoritesPage";
-import { InternationalPage } from "@/pages/InternationalPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +47,12 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function RedirectToLeagues() {
+  const [, setLocation] = useLocation();
+  React.useEffect(() => setLocation("/leagues"), [setLocation]);
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,7 +69,7 @@ function App() {
             <Route path="/birth-year" component={BirthYearPage} />
             <Route path="/prospects" component={ProspectsPage} />
             <Route path="/favorites" component={FavoritesPage} />
-            <Route path="/international" component={InternationalPage} />
+            <Route path="/international" component={RedirectToLeagues} />
             <Route>
                 <div className="font-display text-2xl uppercase text-muted-foreground">Not found</div>
               </Route>

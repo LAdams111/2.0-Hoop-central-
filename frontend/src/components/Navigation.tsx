@@ -10,9 +10,7 @@ const NAV_LINKS = [
   { href: "/leagues", label: "Leagues" },
   { href: "/prospects", label: "Prospects" },
   { href: "/birth-year", label: "Birth Year" },
-  { href: "/international", label: "International" },
   { href: "/players", label: "Directory" },
-  { href: "/favorites", label: "Favorites" },
 ];
 
 const MOBILE_BOTTOM_NAV = [

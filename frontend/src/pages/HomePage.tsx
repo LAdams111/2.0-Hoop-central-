@@ -107,53 +107,34 @@ export function HomePage() {
       {playerIds.length > 0 && (
         <section>
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-primary" />
-              <h2 className="font-display text-3xl font-bold uppercase tracking-tight text-foreground md:text-4xl">
-                Favorites
+            <div>
+              <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-5xl">
+                <span className="text-foreground">Most</span>{" "}
+                <span className="text-primary text-glow">Viewed</span>
               </h2>
+              <p className="mt-1 text-muted-foreground">Trending athletes this week</p>
             </div>
-            <Link href="/favorites">
-              <a className="text-sm font-medium text-primary hover:underline">View all →</a>
+            <Link href="/players">
+              <a className="text-sm font-medium text-primary hover:underline">Explore trends →</a>
             </Link>
           </div>
-          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
-            {orderedFavorites.slice(0, 4).map((p) => (
-              <PlayerCard key={p.id} player={p} />
-            ))}
-          </div>
+          {isError ? (
+            <QueryError message={error instanceof Error ? error.message : "Failed to load players."} onRetry={() => refetch()} />
+          ) : isLoading ? (
+            <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
+              {[1, 2, 3, 4].map((i) => (
+                <PlayerCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
+              {(players as Player[]).slice(0, 8).map((p) => (
+                <PlayerCard key={p.id} player={p} />
+              ))}
+            </div>
+          )}
         </section>
       )}
-
-      <section>
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-5xl">
-              <span className="text-foreground">Most</span>{" "}
-              <span className="text-primary text-glow">Viewed</span>
-            </h2>
-            <p className="mt-1 text-muted-foreground">Trending athletes this week</p>
-          </div>
-          <Link href="/players">
-            <a className="text-sm font-medium text-primary hover:underline">Explore trends →</a>
-          </Link>
-        </div>
-        {isError ? (
-          <QueryError message={error instanceof Error ? error.message : "Failed to load players."} onRetry={() => refetch()} />
-        ) : isLoading ? (
-          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
-            {[1, 2, 3, 4].map((i) => (
-              <PlayerCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
-            {(players as Player[]).slice(0, 8).map((p) => (
-              <PlayerCard key={p.id} player={p} />
-            ))}
-          </div>
-        )}
-      </section>
 
       <section>
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -178,6 +159,52 @@ export function HomePage() {
           </div>
         )}
       </section>
+
+      {playerIds.length > 0 && (
+        <section className="border-y border-border bg-card/30 py-6">
+          <div className="flex flex-wrap items-center gap-4 overflow-x-auto pb-2">
+            <div className="flex shrink-0 items-center gap-2 border-r border-border pr-6">
+              <Heart className="h-5 w-5 text-primary" />
+              <span className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
+                Favorites
+              </span>
+            </div>
+            <div className="flex flex-1 items-center gap-3 overflow-x-auto">
+              {orderedFavorites.slice(0, 8).map((p) => {
+                const headshot = p.headshotUrl || (p.sr_player_id ? `https://cdn.nba.com/headshots/nba/latest/1040x760/${p.sr_player_id}.png` : null);
+                const displayName = p.name || p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "—";
+                return (
+                  <Link key={p.id} href={`/players/${p.id}`}>
+                    <a className="flex shrink-0 flex-col items-center gap-1 transition-opacity hover:opacity-90">
+                      <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-border bg-muted transition-colors hover:border-primary">
+                        {headshot ? (
+                          <img
+                            src={headshot}
+                            alt={displayName}
+                            className="h-full w-full object-cover object-top"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                            <span className="text-lg font-display">?</span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="max-w-[4rem] truncate text-xs text-muted-foreground">
+                        {displayName}
+                      </span>
+                    </a>
+                  </Link>
+                );
+              })}
+            </div>
+            <Link href="/favorites" className="shrink-0">
+              <a className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                View all →
+              </a>
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
