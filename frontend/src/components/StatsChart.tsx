@@ -28,12 +28,12 @@ export function StatsChart({ stats }: StatsChartProps) {
 
   return (
     <section>
-      <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-white">
+      <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-foreground">
         Current season & trends
       </h2>
       <div className="mt-4 grid gap-6 md:grid-cols-2">
-        <div className="rounded-xl border border-white/10 bg-[#141414] p-4">
-          <h3 className="font-display text-sm font-semibold uppercase text-zinc-400">
+        <div className="rounded-xl border border-border bg-card/30 p-4">
+          <h3 className="font-display text-sm font-semibold uppercase text-muted-foreground">
             Points per game
           </h3>
           <div className="mt-2 h-48">
@@ -41,22 +41,22 @@ export function StatsChart({ stats }: StatsChartProps) {
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="ppgGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
+                    <stop offset="0%" stopColor="hsl(24,95%,53%)" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="hsl(24,95%,53%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="season" stroke="#71717a" fontSize={11} />
-                <YAxis stroke="#71717a" fontSize={11} tickFormatter={(v) => String(v)} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                <XAxis dataKey="season" stroke="hsl(215.4,16.3%,46.9%)" fontSize={9} fontFamily="JetBrains Mono" />
+                <YAxis stroke="hsl(215.4,16.3%,46.9%)" fontSize={9} fontFamily="JetBrains Mono" tickFormatter={(v) => String(v)} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#141414", border: "1px solid rgba(255,255,255,0.1)" }}
-                  labelStyle={{ color: "#f97316" }}
+                  contentStyle={{ backgroundColor: "hsl(0,0%,98%)", border: "1px solid hsl(214.3,31.8%,91.4%)", borderRadius: "8px" }}
+                  labelStyle={{ color: "hsl(24,95%,53%)" }}
                   formatter={(value: number | undefined) => [value != null ? value.toFixed(1) : "", "PPG"]}
                 />
                 <Area
                   type="monotone"
                   dataKey="ppg"
-                  stroke="#f97316"
+                  stroke="hsl(24,95%,53%)"
                   fill="url(#ppgGrad)"
                   strokeWidth={2}
                 />
@@ -64,8 +64,8 @@ export function StatsChart({ stats }: StatsChartProps) {
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-[#141414] p-4">
-          <h3 className="font-display text-sm font-semibold uppercase text-zinc-400">
+        <div className="rounded-xl border border-border bg-card/30 p-4">
+          <h3 className="font-display text-sm font-semibold uppercase text-muted-foreground">
             Assists per game
           </h3>
           <div className="mt-2 h-48">
@@ -73,21 +73,21 @@ export function StatsChart({ stats }: StatsChartProps) {
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="apgGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#22d3ee" stopOpacity={0} />
+                    <stop offset="0%" stopColor="hsl(172,66%,50%)" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="hsl(172,66%,50%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="season" stroke="#71717a" fontSize={11} />
-                <YAxis stroke="#71717a" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                <XAxis dataKey="season" stroke="hsl(215.4,16.3%,46.9%)" fontSize={9} fontFamily="JetBrains Mono" />
+                <YAxis stroke="hsl(215.4,16.3%,46.9%)" fontSize={9} fontFamily="JetBrains Mono" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#141414", border: "1px solid rgba(255,255,255,0.1)" }}
+                  contentStyle={{ backgroundColor: "hsl(0,0%,98%)", border: "1px solid hsl(214.3,31.8%,91.4%)", borderRadius: "8px" }}
                   formatter={(value: number | undefined) => [value != null ? value.toFixed(1) : "", "APG"]}
                 />
                 <Area
                   type="monotone"
                   dataKey="apg"
-                  stroke="#22d3ee"
+                  stroke="hsl(172,66%,50%)"
                   fill="url(#apgGrad)"
                   strokeWidth={2}
                 />

@@ -67,32 +67,32 @@ export function LeagueDetailPage() {
   return (
     <div className="space-y-8">
       <Link href="/leagues">
-        <a className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-orange-500">
+        <a className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
           <ArrowLeft className="h-4 w-4" /> Back
         </a>
       </Link>
 
       <div>
-        <p className="text-xs font-medium uppercase text-orange-500">Professional</p>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-white">
+        <p className="text-xs font-medium uppercase text-primary">Professional</p>
+        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-foreground">
           {league ?? "League"}
         </h1>
-        <p className="mt-2 text-zinc-500">
+        <p className="mt-2 text-muted-foreground">
           The National Basketball Association - the premier professional basketball league in the world.
         </p>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="font-display text-xl font-semibold uppercase text-white">
+        <h2 className="font-display text-xl font-semibold uppercase text-foreground">
           Teams {teams.length ? `${filtered.length} of ${teams.length}` : ""}
         </h2>
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search teams..."
             value={teamSearch}
             onChange={(e) => setTeamSearch(e.target.value)}
-            className="pl-9 bg-white/5"
+            className="pl-9 bg-secondary border-border"
           />
         </div>
       </div>
@@ -116,12 +116,12 @@ export function LeagueDetailPage() {
                 key={team.id}
                 href={`/roster/${encodeURIComponent(team.name)}/${season.replace("-", "-")}`}
               >
-                <a className="block rounded-xl border border-white/10 bg-[#141414] p-4 transition hover:border-orange-500/50">
-                  <p className="text-xs text-zinc-500">{league}</p>
-                  <p className="mt-1 font-display font-semibold uppercase text-white">
+                <a className="block rounded-xl border border-border bg-card p-4 transition hover:border-primary/50">
+                  <p className="text-xs text-muted-foreground">{league}</p>
+                  <p className="mt-1 font-display font-semibold uppercase text-foreground">
                     {team.name}
                   </p>
-                  <p className="mt-1 text-sm text-zinc-500">{season}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{season}</p>
                   <div className="mt-3 flex items-center justify-between">
                     <img
                       src={logoUrl}
@@ -131,7 +131,7 @@ export function LeagueDetailPage() {
                         (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
-                    <span className="text-orange-500">→</span>
+                    <span className="text-primary">→</span>
                   </div>
                 </a>
               </Link>
@@ -140,7 +140,7 @@ export function LeagueDetailPage() {
         </div>
       )}
       {!isLoading && filtered.length === 0 && (
-        <p className="py-12 text-center text-zinc-500">No teams found.</p>
+        <p className="py-12 text-center text-muted-foreground">No teams found.</p>
       )}
     </div>
   );

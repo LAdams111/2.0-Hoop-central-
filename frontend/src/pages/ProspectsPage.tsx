@@ -16,18 +16,18 @@ export function ProspectsPage() {
   return (
     <div className="space-y-8">
       <Link href="/">
-        <a className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-orange-500">
+        <a className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
           ← Back to Home
         </a>
       </Link>
       <div className="flex items-center gap-2">
-        <Flame className="h-6 w-6 text-orange-500" />
+        <Flame className="h-6 w-6 text-primary" />
         <h1 className="font-display text-4xl font-bold uppercase tracking-tight">
-          <span className="text-zinc-400">Hottest</span>{" "}
-          <span className="text-orange-500">Prospects</span>
+          <span className="text-muted-foreground">Hottest</span>{" "}
+          <span className="text-primary">Prospects</span>
         </h1>
       </div>
-      <p className="text-zinc-500">Top 50 most viewed players under 20.</p>
+      <p className="text-muted-foreground">Top 50 most viewed players under 20.</p>
 
       {isError ? (
         <QueryError message={error instanceof Error ? error.message : "Failed to load prospects."} onRetry={() => refetch()} />
@@ -41,7 +41,7 @@ export function ProspectsPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {players.map((p, i) => (
             <div key={p.id} className="relative">
-              <span className="absolute left-2 top-2 z-10 font-mono text-lg font-semibold text-zinc-500">
+              <span className="absolute left-2 top-2 z-10 font-mono text-lg font-semibold text-muted-foreground">
                 {i + 1}
               </span>
               <PlayerCard player={p} />
@@ -50,7 +50,7 @@ export function ProspectsPage() {
         </div>
       )}
       {!isLoading && players.length === 0 && (
-        <p className="py-12 text-center text-zinc-500">No prospects found.</p>
+        <p className="py-12 text-center text-muted-foreground">No prospects found.</p>
       )}
     </div>
   );

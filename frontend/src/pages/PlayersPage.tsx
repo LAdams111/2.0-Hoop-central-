@@ -39,10 +39,10 @@ export function PlayersPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-display text-4xl font-bold uppercase tracking-tight">
-          <span className="text-zinc-400">Player</span>{" "}
-          <span className="text-orange-500">Directory</span>
+          <span className="text-muted-foreground">Player</span>{" "}
+          <span className="text-primary">Directory</span>
         </h1>
-        <p className="mt-2 text-zinc-500">
+        <p className="mt-2 text-muted-foreground">
           Browse the complete roster. Filter by position or search by name to find specific athlete stats.
         </p>
       </div>
@@ -56,21 +56,21 @@ export function PlayersPage() {
             setParam("search", q);
           }}
         >
-          <SearchIcon className="h-5 w-5 shrink-0 text-zinc-500" />
+          <SearchIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
           <Input
             name="search"
             placeholder="Search player name..."
             defaultValue={search}
-            className="flex-1 bg-white/5"
+            className="flex-1 bg-secondary border-border"
           />
           <Button type="submit">Search</Button>
         </form>
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-zinc-500" />
+          <Filter className="h-4 w-4 text-muted-foreground" />
           <select
             value={position || "All Positions"}
             onChange={(e) => setParam("position", e.target.value === "All Positions" ? "" : e.target.value)}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-orange-500 focus:outline-none"
+            className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
           >
             {POSITIONS.map((p) => (
               <option key={p} value={p === "All Positions" ? "" : p}>
@@ -97,7 +97,7 @@ export function PlayersPage() {
         </div>
       )}
       {!isLoading && players.length === 0 && (
-        <p className="py-12 text-center text-zinc-500">No players found.</p>
+        <p className="py-12 text-center text-muted-foreground">No players found.</p>
       )}
     </div>
   );

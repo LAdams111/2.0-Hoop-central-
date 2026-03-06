@@ -18,20 +18,20 @@ export function ScraperPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-white">
+        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-foreground">
           Scraper
         </h1>
-        <p className="mt-2 text-zinc-500">Trigger NBA data scraping and view status.</p>
+        <p className="mt-2 text-muted-foreground">Trigger NBA data scraping and view status.</p>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-[#141414] p-6">
-        <h2 className="font-display text-lg font-semibold uppercase text-white">Status</h2>
+      <div className="rounded-xl border border-border bg-card p-6">
+        <h2 className="font-display text-lg font-semibold uppercase text-foreground">Status</h2>
         {isError ? (
           <QueryError message={error instanceof Error ? error.message : "Failed to load status."} onRetry={() => refetch()} />
         ) : isLoading ? (
-          <p className="mt-2 flex items-center gap-2 text-zinc-500"><LoadingSpinner className="h-4 w-4" /> Loading...</p>
+          <p className="mt-2 flex items-center gap-2 text-muted-foreground"><LoadingSpinner className="h-4 w-4" /> Loading...</p>
         ) : (
-          <p className="mt-2 font-mono text-sm text-zinc-400">
+          <p className="mt-2 font-mono text-sm text-muted-foreground">
             {status?.running ? "Running" : "Idle"} {status?.message ?? ""}
           </p>
         )}

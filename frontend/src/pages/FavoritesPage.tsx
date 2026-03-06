@@ -25,18 +25,18 @@ export function FavoritesPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-white flex items-center gap-2">
-          <Heart className="h-8 w-8 text-orange-500 fill-orange-500" />
+        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+          <Heart className="h-8 w-8 text-primary fill-primary" />
           Favorites
         </h1>
-        <p className="mt-2 text-zinc-500">
+        <p className="mt-2 text-muted-foreground">
           Your saved players and teams.
         </p>
       </div>
 
       {playerIds.length > 0 && (
         <section>
-          <h2 className="font-display text-xl font-semibold uppercase text-zinc-400 mb-4">
+          <h2 className="font-display text-xl font-semibold uppercase text-muted-foreground mb-4">
             Players
           </h2>
           {isError ? (
@@ -59,7 +59,7 @@ export function FavoritesPage() {
 
       {teamKeys.length > 0 && (
         <section>
-          <h2 className="font-display text-xl font-semibold uppercase text-zinc-400 mb-4">
+          <h2 className="font-display text-xl font-semibold uppercase text-muted-foreground mb-4">
             Teams
           </h2>
           <ul className="space-y-2">
@@ -68,7 +68,7 @@ export function FavoritesPage() {
               return (
                 <li key={key}>
                   <Link href={`/roster/${encodeURIComponent(team)}/${season?.replace("-", "-") ?? "2025-26"}`}>
-                    <a className="block rounded-lg border border-white/10 bg-[#141414] px-4 py-3 text-orange-500 hover:border-orange-500/50">
+                    <a className="block rounded-lg border border-border bg-card px-4 py-3 text-primary hover:border-primary/50">
                       {team} — {season}
                     </a>
                   </Link>
@@ -80,14 +80,14 @@ export function FavoritesPage() {
       )}
 
       {playerIds.length === 0 && teamKeys.length === 0 && (
-        <div className="rounded-xl border border-white/10 bg-[#141414] py-16 text-center">
-          <Heart className="mx-auto h-12 w-12 text-zinc-600" />
-          <p className="mt-4 text-zinc-500">No favorites yet.</p>
-          <p className="mt-1 text-sm text-zinc-600">
+        <div className="rounded-xl border border-border bg-card py-16 text-center">
+          <Heart className="mx-auto h-12 w-12 text-muted-foreground" />
+          <p className="mt-4 text-muted-foreground">No favorites yet.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Favorite players from their profiles and teams from roster pages.
           </p>
           <Link href="/players">
-            <a className="mt-6 inline-block text-orange-500 hover:underline">Browse players →</a>
+            <a className="mt-6 inline-block text-primary hover:underline">Browse players →</a>
           </Link>
         </div>
       )}

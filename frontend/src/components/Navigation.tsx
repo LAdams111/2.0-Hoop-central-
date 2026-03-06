@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -33,15 +33,15 @@ export function Navigation() {
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4">
+    <header className="sticky top-0 z-50 h-16 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4">
         <Link href="/">
           <a className="flex items-center gap-2 font-display text-xl font-semibold uppercase tracking-tight">
-            <span className="flex h-8 w-8 items-center justify-center rounded bg-orange-500 text-white">
-              🏀
+            <span className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
+              <Trophy className="h-4 w-4" />
             </span>
-            <span className="text-white">Hoop</span>
-            <span className="text-orange-500">Central</span>
+            <span className="text-foreground" style={{ WebkitTextStroke: "1px white", textShadow: "0 0 0 #000" }}>Hoop</span>
+            <span className="text-primary">Central</span>
           </a>
         </Link>
 
@@ -52,8 +52,8 @@ export function Navigation() {
                 className={cn(
                   "font-display text-sm font-medium uppercase tracking-wide transition",
                   location === href || (href !== "/" && location.startsWith(href))
-                    ? "text-orange-500 underline decoration-orange-500 underline-offset-4"
-                    : "text-zinc-400 hover:text-white"
+                    ? "text-primary underline decoration-primary underline-offset-4"
+                    : "text-muted-foreground hover:text-primary"
                 )}
               >
                 {label}
@@ -67,7 +67,7 @@ export function Navigation() {
             <Input
               type="search"
               placeholder="Search players or teams..."
-              className="w-64 bg-white/5"
+              className="w-64 bg-secondary border-border"
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
             />
@@ -87,14 +87,14 @@ export function Navigation() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-white/10 px-4 py-4 md:hidden">
+        <div className="border-t border-border px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-2">
             {NAV_LINKS.map(({ href, label }) => (
               <Link key={href} href={href}>
                 <a
                   className={cn(
                     "block py-2 font-display uppercase",
-                    location === href ? "text-orange-500" : "text-zinc-300"
+                    location === href ? "text-primary" : "text-muted-foreground"
                   )}
                   onClick={() => setMobileOpen(false)}
                 >
@@ -107,6 +107,7 @@ export function Navigation() {
             <Input
               type="search"
               placeholder="Search players..."
+              className="bg-secondary border-border"
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
             />

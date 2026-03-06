@@ -50,26 +50,28 @@ export function HomePage() {
 
   return (
     <div className="space-y-16">
-      <section className="text-center">
-        <p className="mb-2 flex items-center justify-center gap-2 text-sm text-orange-500/90">
-          <Zap className="h-4 w-4" />
+      <section className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(24_95%_53%_/_.1),transparent_50%)] bg-[length:24px_24px] bg-[linear-gradient(rgba(0,0,0,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,.03)_1px,transparent_1px)]" aria-hidden />
+        <p className="relative mb-2 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Zap className="h-4 w-4 text-primary" />
           Real-time stats
         </p>
-        <h1 className="font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
-          <span className="text-white">Hoop</span>
-          <span className="text-orange-500">Central</span>
+        <h1 className="relative font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
+          <span className="text-foreground" style={{ WebkitTextStroke: "1.5px white", textShadow: "1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000" }}>Hoop</span>
+          {" "}
+          <span className="text-primary text-glow">Central</span>
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+        <p className="relative mx-auto mt-4 max-w-xl text-muted-foreground">
           The ultimate database for modern basketball stats. Track performance of the biggest stars and hottest prospects.
         </p>
         <form
-          className="mx-auto mt-8 flex max-w-xl gap-2"
+          className="relative mx-auto mt-8 flex max-w-xl gap-2"
           onSubmit={handleSearch}
         >
           <Input
             name="search"
             placeholder="Search players or teams..."
-            className="flex-1 bg-white/5"
+            className="flex-1 rounded-full border-2 border-foreground/20 bg-white/5 focus-visible:border-primary"
           />
           <Button type="submit" size="icon" className="shrink-0 rounded-full">
             →
@@ -78,26 +80,26 @@ export function HomePage() {
       </section>
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard icon={<Users className="h-5 w-5 text-orange-500" />} value="1,012+" label="Active Players" />
-        <StatCard icon={<Search className="h-5 w-5 text-orange-500" />} value="1.2k" label="Active Scouts" />
-        <StatCard icon={<Trophy className="h-5 w-5 text-orange-500" />} value="75" label="Seasons Tracked" />
-        <StatCard icon={<Building2 className="h-5 w-5 text-orange-500" />} value="30+" label="Teams" />
+        <StatCard icon={<Users className="h-5 w-5 text-primary" />} value="1,012+" label="Active Players" />
+        <StatCard icon={<Search className="h-5 w-5 text-primary" />} value="1.2k" label="Active Scouts" />
+        <StatCard icon={<Trophy className="h-5 w-5 text-primary" />} value="75" label="Seasons Tracked" />
+        <StatCard icon={<Building2 className="h-5 w-5 text-primary" />} value="30+" label="Teams" />
       </section>
 
       {playerIds.length > 0 && (
         <section>
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-orange-500" />
-              <h2 className="font-display text-3xl font-bold uppercase tracking-tight text-white">
+              <Heart className="h-6 w-6 text-primary" />
+              <h2 className="font-display text-3xl font-bold uppercase tracking-tight text-foreground">
                 Favorites
               </h2>
             </div>
             <Link href="/favorites">
-              <a className="text-sm font-medium text-orange-500 hover:underline">View all →</a>
+              <a className="text-sm font-medium text-primary hover:underline">View all →</a>
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
             {orderedFavorites.slice(0, 4).map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}
@@ -109,25 +111,25 @@ export function HomePage() {
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="font-display text-3xl font-bold uppercase tracking-tight">
-              <span className="text-zinc-400">Most</span>{" "}
-              <span className="text-orange-500">Viewed</span>
+              <span className="text-muted-foreground">Most</span>{" "}
+              <span className="text-primary">Viewed</span>
             </h2>
-            <p className="mt-1 text-sm text-zinc-500">Trending athletes this week.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Trending athletes this week.</p>
           </div>
           <Link href="/players">
-            <a className="text-sm font-medium text-orange-500 hover:underline">Explore trends →</a>
+            <a className="text-sm font-medium text-primary hover:underline">Explore trends →</a>
           </Link>
         </div>
         {isError ? (
           <QueryError message={error instanceof Error ? error.message : "Failed to load players."} onRetry={() => refetch()} />
         ) : isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
             {[1, 2, 3, 4].map((i) => (
               <PlayerCardSkeleton key={i} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
             {(players as Player[]).slice(0, 8).map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}
@@ -139,19 +141,19 @@ export function HomePage() {
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="font-display text-3xl font-bold uppercase tracking-tight">
-              <span className="text-zinc-400">Featured</span>{" "}
-              <span className="text-orange-500">Athletes</span>
+              <span className="text-muted-foreground">Featured</span>{" "}
+              <span className="text-primary">Athletes</span>
             </h2>
-            <p className="mt-1 text-sm text-zinc-500">Top performers from the current season.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Top performers from the current season.</p>
           </div>
           <Link href="/players">
-            <a className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
+            <a className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-4 py-2 text-sm hover:bg-secondary">
               View all players →
             </a>
           </Link>
         </div>
         {!isLoading && (players as Player[])?.length > 8 && (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
             {(players as Player[]).slice(8, 12).map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}
@@ -172,13 +174,13 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#141414] p-4">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
         {icon}
-        <div>
-          <p className="font-mono text-2xl font-semibold text-white">{value}</p>
-          <p className="text-xs uppercase text-zinc-500">{label}</p>
-        </div>
+      </span>
+      <div>
+        <p className="stat-value font-display text-3xl font-bold text-foreground">{value}</p>
+        <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
       </div>
     </div>
   );

@@ -20,10 +20,10 @@ export function LeaguesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-white">
+        <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-foreground">
           Leagues
         </h1>
-        <p className="mt-2 text-zinc-500">Browse leagues and explore team rosters.</p>
+        <p className="mt-2 text-muted-foreground">Browse leagues and explore team rosters.</p>
       </div>
 
       {isError ? (
@@ -38,20 +38,20 @@ export function LeaguesPage() {
         <div className="space-y-4">
           {(Array.isArray(leagues) ? leagues : LEAGUES).map((league) => (
             <Link key={league.id} href={`/leagues/${encodeURIComponent(league.name)}`}>
-              <a className="block rounded-xl border border-white/10 bg-[#141414] p-6 transition hover:border-orange-500/50">
+              <a className="block rounded-xl border border-border bg-card p-6 transition hover:border-primary/50">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-medium uppercase text-orange-500">
+                    <p className="text-xs font-medium uppercase text-primary">
                       {league.type ?? "League"}
                     </p>
-                    <h2 className="mt-1 font-display text-2xl font-bold uppercase text-white">
+                    <h2 className="mt-1 font-display text-2xl font-bold uppercase text-foreground">
                       {league.name}
                     </h2>
                     {league.description && (
-                      <p className="mt-2 text-sm text-zinc-500">{league.description}</p>
+                      <p className="mt-2 text-sm text-muted-foreground">{league.description}</p>
                     )}
                   </div>
-                  <ChevronRight className="h-6 w-6 shrink-0 text-orange-500" />
+                  <ChevronRight className="h-6 w-6 shrink-0 text-primary" />
                 </div>
               </a>
             </Link>

@@ -27,7 +27,7 @@ export function BirthYearPage() {
         <h1 className="font-display text-4xl font-bold uppercase tracking-tight text-white">
           Birth year
         </h1>
-        <p className="mt-2 text-zinc-500">
+        <p className="mt-2 text-muted-foreground">
           Browse players by the year they were born, ranked by profile views.
         </p>
       </div>
@@ -35,10 +35,10 @@ export function BirthYearPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {sorted.map(({ year, count }) => (
           <Link key={year} href={`/players?birth_year=${year}`}>
-            <a className="flex flex-col items-center rounded-xl border border-white/10 bg-[#141414] p-6 transition hover:border-orange-500/50">
-              <Calendar className="mb-2 h-8 w-8 text-zinc-500" />
-              <span className="font-display text-2xl font-bold text-white">{year}</span>
-              <span className="mt-1 text-xs text-zinc-500">
+            <a className="flex flex-col items-center rounded-xl border border-border bg-card p-6 transition hover:border-primary/50">
+              <Calendar className="mb-2 h-8 w-8 text-muted-foreground" />
+              <span className="font-display text-2xl font-bold text-foreground">{year}</span>
+              <span className="mt-1 text-xs text-muted-foreground">
                 {count} {count === 1 ? "player" : "players"}
               </span>
             </a>

@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background text-foreground">
       <Navigation />
       <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
       <AdminLock />
@@ -55,7 +55,7 @@ function App() {
             <Route path="/favorites" component={FavoritesPage} />
             <Route path="/international" component={InternationalPage} />
             <Route>
-                <div className="font-display text-2xl uppercase text-zinc-500">Not found</div>
+                <div className="font-display text-2xl uppercase text-muted-foreground">Not found</div>
               </Route>
           </Switch>
         </Layout>
