@@ -51,13 +51,30 @@ export function HomePage() {
   return (
     <div className="space-y-16">
       <section className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(24_95%_53%_/_.1),transparent_50%)] bg-[length:24px_24px] bg-[linear-gradient(rgba(0,0,0,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,.03)_1px,transparent_1px)]" aria-hidden />
-        <p className="relative mb-2 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Zap className="h-4 w-4 text-primary" />
+        {/* Subtle light orange grid overlay - matches Replit */}
+        <div
+          className="absolute inset-0 bg-[length:24px_24px] opacity-60"
+          style={{
+            backgroundImage: `linear-gradient(hsl(var(--primary) / 0.08) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.08) 1px, transparent 1px)`,
+          }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]" aria-hidden />
+        <p className="relative mb-2 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
+          <Zap className="h-4 w-4" />
           Real-time stats
         </p>
         <h1 className="relative font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
-          <span className="text-foreground" style={{ WebkitTextStroke: "1.5px white", textShadow: "1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000" }}>Hoop</span>
+          <span
+            className="text-foreground"
+            style={{
+              WebkitTextStroke: "2px white",
+              paintOrder: "stroke fill",
+              textShadow: "0 0 0 1px black",
+            }}
+          >
+            Hoop
+          </span>
           {" "}
           <span className="text-primary text-glow">Central</span>
         </h1>
@@ -65,15 +82,16 @@ export function HomePage() {
           The ultimate database for modern basketball stats. Track performance of the biggest stars and hottest prospects.
         </p>
         <form
-          className="relative mx-auto mt-8 flex max-w-xl gap-2"
+          className="relative mx-auto mt-8 flex w-full max-w-xl items-center gap-0 rounded-full border-2 border-foreground/90 bg-white/5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
           onSubmit={handleSearch}
         >
+          <Search className="relative left-4 h-5 w-5 shrink-0 text-muted-foreground" />
           <Input
             name="search"
             placeholder="Search players or teams..."
-            className="flex-1 rounded-full border-2 border-foreground/20 bg-white/5 focus-visible:border-primary"
+            className="min-w-0 flex-1 rounded-full border-0 bg-transparent py-3 pl-3 pr-2 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
-          <Button type="submit" size="icon" className="shrink-0 rounded-full">
+          <Button type="submit" size="icon" className="mr-1.5 h-9 w-9 shrink-0 rounded-full">
             →
           </Button>
         </form>
@@ -174,13 +192,13 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+    <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
         {icon}
       </span>
       <div>
-        <p className="stat-value font-display text-3xl font-bold text-foreground">{value}</p>
-        <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
+        <p className="font-mono text-3xl font-bold tracking-tight text-foreground">{value}</p>
+        <p className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
       </div>
     </div>
   );

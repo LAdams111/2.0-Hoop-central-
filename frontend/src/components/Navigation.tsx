@@ -40,7 +40,16 @@ export function Navigation() {
             <span className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
               <Trophy className="h-4 w-4" />
             </span>
-            <span className="text-foreground" style={{ WebkitTextStroke: "1px white", textShadow: "0 0 0 #000" }}>Hoop</span>
+            <span
+              className="text-foreground"
+              style={{
+                WebkitTextStroke: "2px white",
+                paintOrder: "stroke fill",
+                textShadow: "0 0 0 1px black",
+              }}
+            >
+              Hoop
+            </span>
             <span className="text-primary">Central</span>
           </a>
         </Link>
@@ -64,16 +73,19 @@ export function Navigation() {
 
         <div className="flex items-center gap-2">
           <form onSubmit={handleSearchSubmit} className="hidden items-center gap-2 md:flex">
-            <Input
-              type="search"
-              placeholder="Search players or teams..."
-              className="w-64 bg-secondary border-border"
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-            />
-            <Button type="submit" size="icon" variant="default">
-              <Search className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center overflow-hidden rounded-lg border-2 border-foreground/80 bg-white shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+              <Search className="ml-3 h-4 w-4 shrink-0 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search players or teams..."
+                className="w-56 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:w-64"
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+              />
+              <Button type="submit" size="icon" className="rounded-none">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </form>
           <Button
             variant="ghost"
