@@ -40,7 +40,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       />
       <div className="relative">
         <Navigation />
-        <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-4 py-8 pb-20 md:pb-8">{children}</main>
         <AdminLock />
       </div>
     </div>

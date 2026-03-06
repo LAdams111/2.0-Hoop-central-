@@ -75,7 +75,7 @@ export function PlayerCard({ player, className }: PlayerCardProps) {
             )}
           </div>
           <div className="p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground font-body">
+            <p className="text-xs font-medium uppercase tracking-widest text-primary font-mono">
               {team}
             </p>
             <h3 className="mt-1 flex flex-col gap-0">

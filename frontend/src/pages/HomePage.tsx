@@ -66,10 +66,11 @@ export function HomePage() {
         </p>
         <h1 className="relative font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
           <span
-            className="text-white"
+            className="text-foreground"
             style={{
-              WebkitTextStroke: "2px black",
-              paintOrder: "stroke fill",
+              color: "black",
+              textShadow:
+                "-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff, 0 -2px 0 #fff, 0 2px 0 #fff",
             }}
           >
             Hoop
@@ -196,7 +197,7 @@ function StatCard({
         {icon}
       </span>
       <div>
-        <p className="font-mono text-3xl font-bold tracking-tight text-foreground">{value}</p>
+        <p className="font-display text-3xl font-bold tracking-tight text-foreground">{value}</p>
         <p className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
       </div>
     </div>

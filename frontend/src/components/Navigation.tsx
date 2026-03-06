@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, Trophy } from "lucide-react";
+import { Search, Menu, X, Trophy, Home, Layers, Flame, Calendar, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ const NAV_LINKS = [
   { href: "/international", label: "International" },
   { href: "/players", label: "Directory" },
   { href: "/favorites", label: "Favorites" },
+];
+
+const MOBILE_BOTTOM_NAV = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/leagues", label: "Leagues", icon: Layers },
+  { href: "/prospects", label: "Prospects", icon: Flame },
+  { href: "/birth-year", label: "Birth Year", icon: Calendar },
+  { href: "/players", label: "Directory", icon: Users },
 ];
 
 export function Navigation() {
@@ -41,10 +49,11 @@ export function Navigation() {
               <Trophy className="h-4 w-4" />
             </span>
             <span
-              className="text-white"
+              className="text-foreground"
               style={{
-                WebkitTextStroke: "2px black",
-                paintOrder: "stroke fill",
+                color: "black",
+                textShadow:
+                  "-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff, 0 -2px 0 #fff, 0 2px 0 #fff",
               }}
             >
               Hoop
@@ -126,6 +135,29 @@ export function Navigation() {
           </form>
         </div>
       )}
+
+      {/* Mobile bottom nav - per design reference */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border">
+        <div className="flex items-center justify-around h-14">
+          {MOBILE_BOTTOM_NAV.map(({ href, label, icon: Icon }) => {
+            const isActive =
+              location === href || (href !== "/" && location.startsWith(href));
+            return (
+              <Link key={href} href={href}>
+                <a
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] font-medium tracking-wide">{label}</span>
+                </a>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </header>
   );
 }
