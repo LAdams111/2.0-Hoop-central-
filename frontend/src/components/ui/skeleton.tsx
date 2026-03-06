@@ -15,11 +15,15 @@ export function Skeleton({ className }: SkeletonProps) {
 
 export function PlayerCardSkeleton() {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <Skeleton className="aspect-[4/5] w-full rounded-lg" />
-      <Skeleton className="mt-3 h-3 w-16" />
-      <Skeleton className="mt-2 h-5 w-3/4" />
-      <Skeleton className="mt-2 h-3 w-full" />
+    <div className="rounded-2xl border border-border bg-card p-0 overflow-hidden">
+      <Skeleton className="aspect-[4/5] w-full rounded-t-2xl rounded-b-none" />
+      <div className="p-4">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="mt-2 h-6 w-24" />
+        <Skeleton className="mt-1 h-4 w-32" />
+        <Skeleton className="mt-3 h-3 w-full border-t border-border pt-3" />
+        <Skeleton className="mt-2 h-3 w-24" />
+      </div>
     </div>
   );
 }

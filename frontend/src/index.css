@@ -96,6 +96,9 @@
   .font-display {
     font-family: var(--font-display);
   }
+  .font-body {
+    font-family: var(--font-body);
+  }
   .text-glow {
     text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
   }

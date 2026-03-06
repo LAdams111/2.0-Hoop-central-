@@ -29,10 +29,20 @@ const queryClient = new QueryClient({
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navigation />
-      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
-      <AdminLock />
+    <div className="min-h-screen bg-background text-foreground relative">
+      {/* Subtle light orange grid on entire page - matches Replit */}
+      <div
+        className="fixed inset-0 pointer-events-none bg-[length:24px_24px] opacity-50"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--primary) / 0.06) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.06) 1px, transparent 1px)`,
+        }}
+        aria-hidden
+      />
+      <div className="relative">
+        <Navigation />
+        <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+        <AdminLock />
+      </div>
     </div>
   );
 }

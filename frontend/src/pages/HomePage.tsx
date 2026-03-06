@@ -66,11 +66,10 @@ export function HomePage() {
         </p>
         <h1 className="relative font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
           <span
-            className="text-foreground"
+            className="text-white"
             style={{
-              WebkitTextStroke: "2px white",
+              WebkitTextStroke: "2px black",
               paintOrder: "stroke fill",
-              textShadow: "0 0 0 1px black",
             }}
           >
             Hoop
@@ -82,7 +81,7 @@ export function HomePage() {
           The ultimate database for modern basketball stats. Track performance of the biggest stars and hottest prospects.
         </p>
         <form
-          className="relative mx-auto mt-8 flex w-full max-w-xl items-center gap-0 rounded-full border-2 border-foreground/90 bg-white/5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+          className="relative mx-auto mt-8 flex w-full max-w-xl items-center gap-0 rounded-full border-2 border-foreground bg-white/5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
           onSubmit={handleSearch}
         >
           <Search className="relative left-4 h-5 w-5 shrink-0 text-muted-foreground" />
@@ -109,7 +108,7 @@ export function HomePage() {
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-center gap-2">
               <Heart className="h-6 w-6 text-primary" />
-              <h2 className="font-display text-3xl font-bold uppercase tracking-tight text-foreground">
+              <h2 className="font-display text-3xl font-bold uppercase tracking-tight text-foreground md:text-4xl">
                 Favorites
               </h2>
             </div>
@@ -128,8 +127,8 @@ export function HomePage() {
       <section>
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl font-bold uppercase tracking-tight">
-              <span className="text-muted-foreground">Most</span>{" "}
+            <h2 className="font-display text-3xl font-bold uppercase tracking-tight md:text-4xl">
+              <span className="text-foreground">Most</span>{" "}
               <span className="text-primary">Viewed</span>
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">Trending athletes this week.</p>
@@ -158,8 +157,8 @@ export function HomePage() {
       <section>
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl font-bold uppercase tracking-tight">
-              <span className="text-muted-foreground">Featured</span>{" "}
+            <h2 className="font-display text-3xl font-bold uppercase tracking-tight md:text-4xl">
+              <span className="text-foreground">Featured</span>{" "}
               <span className="text-primary">Athletes</span>
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">Top performers from the current season.</p>

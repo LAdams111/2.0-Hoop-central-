@@ -41,11 +41,10 @@ export function Navigation() {
               <Trophy className="h-4 w-4" />
             </span>
             <span
-              className="text-foreground"
+              className="text-white"
               style={{
-                WebkitTextStroke: "2px white",
+                WebkitTextStroke: "2px black",
                 paintOrder: "stroke fill",
-                textShadow: "0 0 0 1px black",
               }}
             >
               Hoop
@@ -59,7 +58,7 @@ export function Navigation() {
             <Link key={href} href={href}>
               <a
                 className={cn(
-                  "font-display text-sm font-medium uppercase tracking-wide transition",
+                  "text-sm font-medium uppercase tracking-wide transition font-body",
                   location === href || (href !== "/" && location.startsWith(href))
                     ? "text-primary underline decoration-primary underline-offset-4"
                     : "text-muted-foreground hover:text-primary"
@@ -73,16 +72,16 @@ export function Navigation() {
 
         <div className="flex items-center gap-2">
           <form onSubmit={handleSearchSubmit} className="hidden items-center gap-2 md:flex">
-            <div className="flex items-center overflow-hidden rounded-lg border-2 border-foreground/80 bg-white shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-              <Search className="ml-3 h-4 w-4 shrink-0 text-muted-foreground" />
+            <div className="flex w-full max-w-sm items-center overflow-hidden rounded-full border-2 border-foreground bg-white shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+              <Search className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search players or teams..."
-                className="w-56 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:w-64"
+                className="w-48 flex-1 border-0 bg-transparent py-2 pl-2 pr-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:w-56"
                 value={searchQ}
                 onChange={(e) => setSearchQ(e.target.value)}
               />
-              <Button type="submit" size="icon" className="rounded-none">
+              <Button type="submit" size="icon" className="mr-1 h-8 w-8 shrink-0 rounded-full">
                 <Search className="h-4 w-4" />
               </Button>
             </div>
@@ -105,7 +104,7 @@ export function Navigation() {
               <Link key={href} href={href}>
                 <a
                   className={cn(
-                    "block py-2 font-display uppercase",
+                    "block py-2 font-body text-sm font-medium uppercase tracking-wide",
                     location === href ? "text-primary" : "text-muted-foreground"
                   )}
                   onClick={() => setMobileOpen(false)}
