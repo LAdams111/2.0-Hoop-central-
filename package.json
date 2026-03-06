@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "cd frontend && npm ci && npm run build",
     "db:schema": "psql -d hoop_central -f db/schema.sql",
     "db:create": "createdb hoop_central",
     "db:migrate": "node db/run-schema.js"

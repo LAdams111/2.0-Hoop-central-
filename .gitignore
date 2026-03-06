@@ -9,3 +9,6 @@ node_modules/
 # Logs and runtime
 npm-debug.log*
 *.log
+
+# Frontend build (generated)
+frontend/dist
