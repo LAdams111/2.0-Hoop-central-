@@ -1,4 +1,4 @@
--- Scrape job queue for resumable NCAA player ingestion.
+-- Scrape job queue for resumable NBA player ingestion.
 -- Run once on existing databases: psql $DATABASE_URL -f add_player_scrape_jobs.sql
 CREATE TABLE IF NOT EXISTS player_scrape_jobs (
   id SERIAL PRIMARY KEY,

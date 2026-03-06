@@ -1,5 +1,5 @@
 -- Hoop Central 2.0 — Canonical sports database schema
--- Supports tens of thousands of players across many seasons (NCAA, NBA, etc.)
+-- Supports NBA (and other leagues) player and season stats.
 
 -- =============================================================================
 -- CORE ENTITIES (independent of time/season)
@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS players (
   weight_kg INT,
   position TEXT,
   nationality TEXT,
+  college TEXT,
+  draft_year INT,
+  draft_round INT,
+  draft_pick INT,
   sr_player_id TEXT UNIQUE,
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -82,19 +86,31 @@ CREATE TABLE IF NOT EXISTS player_season_stats (
   id SERIAL PRIMARY KEY,
   player_season_id INT NOT NULL REFERENCES player_seasons(id) ON DELETE CASCADE,
   games INT,
+  games_started INT,
   minutes INT,
-  points INT,
+  fg INT,
+  fga INT,
+  fg_pct NUMERIC,
+  fg3 INT,
+  fg3a INT,
+  three_pct NUMERIC,
+  ft INT,
+  fta INT,
+  ft_pct NUMERIC,
+  orb INT,
+  drb INT,
   rebounds INT,
   assists INT,
   steals INT,
   blocks INT,
-  fg_pct NUMERIC,
-  three_pct NUMERIC,
-  ft_pct NUMERIC
+  turnovers INT,
+  fouls INT,
+  points INT,
+  created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- =============================================================================
--- SCRAPE JOB QUEUE (resumable NCAA player ingestion)
+-- SCRAPE JOB QUEUE (resumable NBA player ingestion)
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS player_scrape_jobs (

@@ -14,6 +14,10 @@ const { query } = require("../db/db");
  * @param {number} [playerData.weight_kg]
  * @param {string} [playerData.position]
  * @param {string} [playerData.nationality]
+ * @param {string} [playerData.college]
+ * @param {number} [playerData.draft_year]
+ * @param {number} [playerData.draft_round]
+ * @param {number} [playerData.draft_pick]
  * @returns {Promise<{ id: number, full_name: string, ... }>}
  */
 async function findOrCreatePlayer(playerData) {
@@ -28,6 +32,10 @@ async function findOrCreatePlayer(playerData) {
     weight_kg,
     position,
     nationality,
+    college,
+    draft_year,
+    draft_round,
+    draft_pick,
   } = playerData;
 
   if (sr_player_id) {
@@ -45,8 +53,8 @@ async function findOrCreatePlayer(playerData) {
   if (existingByName.rows.length > 0) return existingByName.rows[0];
 
   const insert = await query(
-    `INSERT INTO players (full_name, first_name, last_name, birth_date, birth_place, position, height_cm, weight_kg, sr_player_id, nationality)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `INSERT INTO players (full_name, first_name, last_name, birth_date, birth_place, position, height_cm, weight_kg, sr_player_id, nationality, college, draft_year, draft_round, draft_pick)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
      ON CONFLICT (sr_player_id) DO NOTHING
      RETURNING *`,
     [
@@ -60,6 +68,10 @@ async function findOrCreatePlayer(playerData) {
       weight_kg ?? null,
       sr_player_id ?? null,
       nationality ?? null,
+      college ?? null,
+      draft_year ?? null,
+      draft_round ?? null,
+      draft_pick ?? null,
     ]
   );
 

@@ -1,8 +1,8 @@
 /**
- * Validates the NCAA scraping pipeline with a small batch of test jobs.
+ * Validates the NBA scraping pipeline with a small batch of test jobs.
  * Run: node jobs/testScrapePipeline.js
  *
- * 1. Clears player_scrape_jobs and inserts 10 test player URLs.
+ * 1. Clears player_scrape_jobs and inserts 10 test NBA player URLs (Basketball Reference).
  * 2. Starts the worker pool from runPlayerWorkers.js.
  * 3. Prints job progress every 5 seconds.
  * 4. Exits when all jobs reach status "complete".
@@ -11,16 +11,16 @@
 const { query } = require("../db/db");
 
 const TEST_URLS = [
-  "https://www.sports-reference.com/cbb/players/zion-williamson-1.html",
-  "https://www.sports-reference.com/cbb/players/stephen-curry-1.html",
-  "https://www.sports-reference.com/cbb/players/ja-morant-1.html",
-  "https://www.sports-reference.com/cbb/players/kevin-durant-1.html",
-  "https://www.sports-reference.com/cbb/players/jayson-tatum-1.html",
-  "https://www.sports-reference.com/cbb/players/luka-doncic-1.html",
-  "https://www.sports-reference.com/cbb/players/anthony-davis-1.html",
-  "https://www.sports-reference.com/cbb/players/jimmy-butler-1.html",
-  "https://www.sports-reference.com/cbb/players/draymond-green-1.html",
-  "https://www.sports-reference.com/cbb/players/kyrie-irving-1.html",
+  "https://www.basketball-reference.com/players/j/jamesle01.html",
+  "https://www.basketball-reference.com/players/c/curryst01.html",
+  "https://www.basketball-reference.com/players/d/duranke01.html",
+  "https://www.basketball-reference.com/players/a/antetgi01.html",
+  "https://www.basketball-reference.com/players/j/jokicni01.html",
+  "https://www.basketball-reference.com/players/d/doncilu01.html",
+  "https://www.basketball-reference.com/players/h/hardeja01.html",
+  "https://www.basketball-reference.com/players/l/leonaka01.html",
+  "https://www.basketball-reference.com/players/d/davisan02.html",
+  "https://www.basketball-reference.com/players/t/tatumja01.html",
 ];
 
 async function setupTestJobs() {

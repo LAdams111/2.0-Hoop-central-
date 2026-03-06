@@ -1,6 +1,6 @@
 /**
  * Run the player scrape worker pool. Processes the full player_scrape_jobs queue
- * until no pending jobs remain (mark processing → scrape → complete/failed).
+ * (NBA players from Basketball Reference) until no pending jobs remain.
  *
  * Usage:
  *   1. Generate jobs: node jobs/generatePlayerJobs.js

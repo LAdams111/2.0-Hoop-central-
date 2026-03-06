@@ -1,5 +1,5 @@
 const { pool } = require("../db/db");
-const { scrapePlayer } = require("../scrapers/ncaa/sportsReferencePlayerScraper");
+const { scrapePlayer } = require("../scrapers/nba/basketballReferencePlayerScraper");
 const browserService = require("../services/browserService");
 
 /** Delay between requests (1.5–2.5s with jitter) to avoid rate limits. */
@@ -23,8 +23,8 @@ function rateLimitDelay() {
 }
 
 /**
- * Extract Sports Reference player ID from URL.
- * e.g. "https://.../cbb/players/zion-williamson-1.html" -> "zion-williamson-1"
+ * Extract Basketball Reference player ID from URL.
+ * e.g. "https://.../players/j/jamesle01.html" -> "jamesle01"
  */
 function extractPlayerId(url) {
   if (!url || typeof url !== "string") return null;
@@ -34,7 +34,7 @@ function extractPlayerId(url) {
 
 /**
  * Check if a player already exists in the database (cache check).
- * @param {string} sr_player_id - Sports Reference player ID
+ * @param {string} sr_player_id - Basketball Reference player ID (e.g. jamesle01)
  * @returns {Promise<boolean>}
  */
 async function playerExists(sr_player_id) {

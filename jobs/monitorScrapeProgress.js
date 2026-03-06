@@ -1,5 +1,5 @@
 /**
- * Live terminal progress dashboard for the NCAA scraping pipeline.
+ * Live terminal progress dashboard for the NBA scraping pipeline.
  * Run: node jobs/monitorScrapeProgress.js
  *
  * Workers run separately: node jobs/runPlayerWorkers.js
