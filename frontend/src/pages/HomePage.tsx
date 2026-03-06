@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Zap, Users, Search, Trophy, Building2, Heart } from "lucide-react";
+import { Users, Search, Trophy, Building2, Heart, Activity, ArrowRight } from "lucide-react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,58 +50,58 @@ export function HomePage() {
 
   return (
     <div className="space-y-16">
-      <section className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
-        {/* Subtle light orange grid overlay - matches Replit */}
-        <div
-          className="absolute inset-0 bg-[length:24px_24px] opacity-60"
-          style={{
-            backgroundImage: `linear-gradient(hsl(var(--primary) / 0.08) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.08) 1px, transparent 1px)`,
-          }}
-          aria-hidden
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]" aria-hidden />
-        <p className="relative mb-2 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
-          <Zap className="h-4 w-4" />
-          Real-time stats
-        </p>
-        <h1 className="relative font-display text-5xl font-bold uppercase tracking-tight md:text-7xl">
-          <span
-            className="text-foreground"
+      <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-visible border-b border-border/40 text-center">
+        <div className="absolute inset-0 z-0 bg-background">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.1),hsl(var(--background)),hsl(var(--background)))]" />
+          <div
+            className="absolute inset-0 bg-[length:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black_70%,transparent_100%)]"
             style={{
-              color: "black",
-              textShadow:
-                "-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff, 0 -2px 0 #fff, 0 2px 0 #fff",
+              backgroundImage: `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`,
             }}
-          >
-            Hoop
-          </span>
-          {" "}
-          <span className="text-primary text-glow">Central</span>
-        </h1>
-        <p className="relative mx-auto mt-4 max-w-xl text-muted-foreground">
-          The ultimate database for modern basketball stats. Track performance of the biggest stars and hottest prospects.
-        </p>
-        <form
-          className="relative mx-auto mt-8 flex w-full max-w-xl items-center gap-0 rounded-full border-2 border-foreground bg-white/5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-          onSubmit={handleSearch}
-        >
-          <Search className="relative left-4 h-5 w-5 shrink-0 text-muted-foreground" />
-          <Input
-            name="search"
-            placeholder="Search players or teams..."
-            className="min-w-0 flex-1 rounded-full border-0 bg-transparent py-3 pl-3 pr-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+            aria-hidden
           />
-          <Button type="submit" size="icon" className="mr-1.5 h-9 w-9 shrink-0 rounded-full">
-            →
-          </Button>
-        </form>
+        </div>
+        <div className="container relative z-10 px-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-primary mb-6">
+            <Activity className="h-3 w-3" />
+            <span>REAL-TIME STATS</span>
+          </div>
+          <h1 className="font-display text-7xl font-bold uppercase tracking-tighter text-foreground mb-6 md:text-9xl">
+            <span
+              style={{
+                color: "black",
+                textShadow:
+                  "-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff, 0 -2px 0 #fff, 0 2px 0 #fff",
+              }}
+            >
+              HOOP
+            </span>
+            <span className="text-primary text-glow">CENTRAL</span>
+          </h1>
+          <p className="font-body mx-auto mb-10 max-w-2xl text-xl text-muted-foreground md:text-2xl">
+            The ultimate database for modern basketball stats. Track performance of the biggest stars and hottest prospects.
+          </p>
+          <form className="relative mx-auto max-w-md group z-[100]" onSubmit={handleSearch}>
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            <Input
+              name="search"
+              placeholder="Search players or teams..."
+              className="rounded-full border-2 border-foreground bg-white/5 py-7 pl-12 text-lg placeholder:text-muted-foreground/50 focus-visible:border-primary/50 focus-visible:ring-primary/20"
+            />
+            <Button type="submit" size="icon" className="absolute right-2 top-2 h-10 w-10 rounded-full">
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard icon={<Users className="h-5 w-5 text-primary" />} value="1,012+" label="Active Players" />
-        <StatCard icon={<Search className="h-5 w-5 text-primary" />} value="1.2k" label="Active Scouts" />
-        <StatCard icon={<Trophy className="h-5 w-5 text-primary" />} value="75" label="Seasons Tracked" />
-        <StatCard icon={<Building2 className="h-5 w-5 text-primary" />} value="30+" label="Teams" />
+      <section className="border-b border-border/40 bg-card/30 py-8 backdrop-blur-sm">
+        <div className="container mx-auto grid grid-cols-2 gap-8 px-4 md:grid-cols-4">
+          <StatCard icon={<Users className="h-6 w-6 text-primary" />} value="1,012+" label="Active Players" />
+          <StatCard icon={<Search className="h-6 w-6 text-primary" />} value="1.2k" label="Active Scouts" />
+          <StatCard icon={<Trophy className="h-6 w-6 text-primary" />} value="75" label="Seasons Tracked" />
+          <StatCard icon={<Building2 className="h-6 w-6 text-primary" />} value="30+" label="Teams" />
+        </div>
       </section>
 
       {playerIds.length > 0 && (
@@ -128,11 +128,11 @@ export function HomePage() {
       <section>
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl font-bold uppercase tracking-tight md:text-4xl">
+            <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-5xl">
               <span className="text-foreground">Most</span>{" "}
-              <span className="text-primary">Viewed</span>
+              <span className="text-primary text-glow">Viewed</span>
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">Trending athletes this week.</p>
+            <p className="mt-1 text-muted-foreground">Trending athletes this week</p>
           </div>
           <Link href="/players">
             <a className="text-sm font-medium text-primary hover:underline">Explore trends →</a>
@@ -158,11 +158,11 @@ export function HomePage() {
       <section>
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl font-bold uppercase tracking-tight md:text-4xl">
+            <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-5xl">
               <span className="text-foreground">Featured</span>{" "}
               <span className="text-primary">Athletes</span>
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">Top performers from the current season.</p>
+            <p className="mt-1 text-muted-foreground">Top performers from the current season</p>
           </div>
           <Link href="/players">
             <a className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-4 py-2 text-sm hover:bg-secondary">
@@ -192,13 +192,13 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+    <div className="flex items-center justify-center gap-4 group">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
         {icon}
-      </span>
+      </div>
       <div>
-        <p className="font-display text-3xl font-bold tracking-tight text-foreground">{value}</p>
-        <p className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="font-display text-3xl font-bold text-foreground">{value}</p>
+        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
       </div>
     </div>
   );

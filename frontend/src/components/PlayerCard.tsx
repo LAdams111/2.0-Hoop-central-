@@ -47,16 +47,17 @@ export function PlayerCard({ player, className }: PlayerCardProps) {
   return (
     <Link href={`/players/${player.id}`}>
       <a className={cn("block group", className)}>
-        <div className="rounded-2xl border border-border bg-card p-0 overflow-hidden transition hover:-translate-y-px hover:border-primary/50 hover:shadow-[0_4px_20px_hsl(var(--color-primary)/0.08)]">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-muted">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden p-0 transition-all duration-300 hover:-translate-y-px hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
+          <div className="relative aspect-[4/5] overflow-hidden bg-muted flex-shrink-0">
             {headshot ? (
               <>
+                <div className="absolute inset-0 z-10 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
                 <img
                   src={headshot}
                   alt={playerDisplayName(player)}
-                  className="h-full w-full object-cover object-top"
+                  className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
                 />
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
               </>
             ) : (
               <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -64,41 +65,42 @@ export function PlayerCard({ player, className }: PlayerCardProps) {
               </div>
             )}
             {jersey && (
-              <span className="absolute right-2 top-2 text-5xl font-display font-bold text-foreground/5 transition group-hover:text-primary/10">
-                {player.jerseyNumber}
+              <span className="absolute right-2 top-2 z-20 text-xl font-display font-bold text-foreground/5 transition-colors group-hover:text-primary/10 md:right-4 md:top-4 md:text-4xl">
+                #{player.jerseyNumber}
               </span>
             )}
             {position && position !== "—" && (
-              <span className="absolute bottom-2 left-2 rounded-lg bg-primary px-2 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground">
+              <span className="absolute bottom-2 left-2 z-20 rounded-sm bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground md:bottom-4 md:left-4 md:px-2.5 md:text-xs">
                 {position}
               </span>
             )}
           </div>
-          <div className="p-4">
-            <p className="text-xs font-medium uppercase tracking-widest text-primary font-mono">
-              {team}
-            </p>
-            <h3 className="mt-1 flex flex-col gap-0">
-              <span className="font-display text-xl font-bold uppercase tracking-tight text-foreground group-hover:text-primary">
-                {first}
-              </span>
-              {last && (
-                <span className="font-body text-base font-semibold uppercase tracking-tight text-foreground">
-                  {last}
-                </span>
-              )}
-            </h3>
+          <div className="relative z-20 flex flex-1 flex-col justify-between gap-1 p-2 md:gap-3 md:p-5">
+            <div className="min-h-0">
+              <p className="mb-0.5 truncate text-[8px] font-mono uppercase tracking-widest text-primary md:mb-1 md:text-[10px]">
+                {team}
+              </p>
+              <h3 className="font-display leading-tight text-foreground transition-colors line-clamp-2 group-hover:text-primary text-sm md:text-2xl">
+                {last ? (
+                  <>
+                    {first} <span className="font-bold">{last}</span>
+                  </>
+                ) : (
+                  <span className="font-bold">{first}</span>
+                )}
+              </h3>
+            </div>
             {(height !== "—" || weight !== "—") && (
-              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-3 font-mono text-xs text-muted-foreground">
+              <p className="mt-auto hidden flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-3 font-mono text-[10px] text-muted-foreground whitespace-nowrap overflow-hidden md:flex">
                 {height !== "—" && (
-                  <span className="flex items-center gap-1.5">
-                    <Ruler className="h-3.5 w-3.5 text-muted-foreground/80" />
+                  <span className="flex items-center gap-1.5 flex-shrink-0">
+                    <Ruler className="h-3 w-3 text-primary" />
                     {height}
                   </span>
                 )}
                 {weight !== "—" && (
-                  <span className="flex items-center gap-1.5">
-                    <Scale className="h-3.5 w-3.5 text-muted-foreground/80" />
+                  <span className="flex items-center gap-1.5 flex-shrink-0">
+                    <Scale className="h-3 w-3 text-primary" />
                     {weight}
                   </span>
                 )}

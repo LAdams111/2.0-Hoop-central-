@@ -44,20 +44,11 @@ export function Navigation() {
     <header className="sticky top-0 z-50 h-16 border-b border-border/40 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4">
         <Link href="/">
-          <a className="flex items-center gap-2 font-display text-xl font-semibold uppercase tracking-tight">
+          <a className="group flex items-center gap-2 font-display text-2xl font-bold tracking-widest">
             <span className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
               <Trophy className="h-4 w-4" />
             </span>
-            <span
-              className="text-foreground"
-              style={{
-                color: "black",
-                textShadow:
-                  "-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff, 0 -2px 0 #fff, 0 2px 0 #fff",
-              }}
-            >
-              Hoop
-            </span>
+            <span className="font-display text-2xl font-bold tracking-widest text-foreground transition-colors group-hover:text-primary">Hoop</span>
             <span className="text-primary">Central</span>
           </a>
         </Link>

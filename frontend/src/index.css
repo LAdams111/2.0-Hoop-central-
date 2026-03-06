@@ -72,6 +72,9 @@
 }
 
 @layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
   html {
     font-family: var(--font-body);
     background: hsl(var(--background));
@@ -81,6 +84,12 @@
     font-family: var(--font-body);
     background: hsl(var(--background));
     color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body::selection {
+    background: hsl(var(--primary) / 0.3);
+    color: hsl(var(--primary-foreground));
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
@@ -105,7 +114,8 @@
   .glass-card {
     background: hsl(var(--card) / 0.6);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border));
+    border: 1px solid hsl(var(--border) / 0.2);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
   *:focus-visible {
     outline: 2px solid hsl(var(--ring));
